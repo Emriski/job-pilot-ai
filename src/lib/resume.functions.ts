@@ -52,7 +52,7 @@ export const updateParsedResume = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("resumes")
-      .update({ parsed: data.parsed })
+      .update({ parsed: data.parsed as never })
       .eq("id", data.resumeId)
       .eq("user_id", context.userId);
     if (error) {
