@@ -78,10 +78,12 @@ export async function extractResumeText(bytes: Uint8Array, kind: DetectedKind): 
 
   try {
     const entries = unzipSync(bytes);
-    const parts = ["word/document.xml", "word/header1.xml", "word/footer1.xml"]
-      .map((name) => entries[name])
-      .filter((entry): entry is Uint8Array => Boolean(entry))
-      .map((entry) => strFromU8(entry));
+    const parts: string[] = [];
+    for (const name of ["word/document.xml", "word/header1.xml", "word/footer1.xml"]) {
+      const entry = entries[name];
+      if (entry) parts.push(strFromU8(entry));
+    }
+
 
     const xml = parts.join("\n");
     const text = xml
