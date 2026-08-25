@@ -41,10 +41,10 @@ function AdminSourcesPage() {
   });
 
   const syncMutation = useMutation({
-    mutationFn: (slug?: string) => sync({ data: { slug } }),
+    mutationFn: (slug: string | undefined) => sync({ data: slug ? { slug } : {} }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["admin-sources"] });
-      toast.success(`Sync finished — ${result.inserted} new, ${result.updated} updated.`);
+      toast.success(`Sync finished — ${result.upserted} listings updated across ${result.sources.length} sources.`);
     },
     onError: (error: Error) => toast.error(error.message || "The sync couldn't be completed."),
   });
@@ -60,7 +60,7 @@ function AdminSourcesPage() {
   if (dashboardQuery.isError) {
     return (
       <AppShell isAdmin={Boolean(contextQuery.data?.isAdmin)}>
-        <ErrorState title="Admin access required" message="This area is only available to administrators." />
+        <ErrorState message="This area is only available to administrators." />
       </AppShell>
     );
   }
@@ -84,17 +84,17 @@ function AdminSourcesPage() {
           <article key={source.slug} className="surface-panel p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="font-display text-base font-semibold text-foreground">{source.label}</h2>
+                <h2 className="font-display text-base font-semibold text-foreground">{source.name}</h2>
                 <p className="text-xs text-muted-foreground">{source.slug}</p>
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant={source.enabled ? "secondary" : "outline"}>
-                  {source.requires_config ? "Requires configuration" : source.enabled ? "Enabled" : "Disabled"}
+                  {(source.status === "requires_configuration") ? "Requires configuration" : source.enabled ? "Enabled" : "Disabled"}
                 </Badge>
                 <Switch
                   checked={Boolean(source.enabled)}
-                  disabled={Boolean(source.requires_config) || toggleMutation.isPending}
-                  aria-label={`Enable ${source.label}`}
+                  disabled={Boolean((source.status === "requires_configuration")) || toggleMutation.isPending}
+                  aria-label={`Enable ${source.name}`}
                   onCheckedChange={(checked) => toggleMutation.mutate({ slug: source.slug, enabled: checked })}
                 />
               </div>
@@ -108,12 +108,12 @@ function AdminSourcesPage() {
               <div>
                 <dt className="text-xs uppercase tracking-wide text-muted-foreground">Last sync</dt>
                 <dd className="text-foreground">
-                  {source.last_synced_at ? new Date(source.last_synced_at).toLocaleString() : "Never"}
+                  {source.last_sync_at ? new Date(source.last_sync_at).toLocaleString() : "Never"}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-muted-foreground">Status</dt>
-                <dd className="text-foreground">{source.last_status ?? "Unknown"}</dd>
+                <dd className="text-foreground">{source.status ?? "Unknown"}</dd>
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-muted-foreground">Last error</dt>
@@ -121,7 +121,7 @@ function AdminSourcesPage() {
               </div>
             </dl>
 
-            {source.requires_config ? (
+            {(source.status === "requires_configuration") ? (
               <p className="mt-3 text-xs text-muted-foreground">
                 This source has no public, permitted API. JobePilotAI does not scrape it or bypass its access rules.
               </p>
@@ -160,9 +160,9 @@ function AdminSourcesPage() {
                   <tr key={run.id} className="border-t border-border">
                     <td className="py-2 pr-4">{run.source_slug}</td>
                     <td className="py-2 pr-4">{new Date(run.started_at).toLocaleString()}</td>
-                    <td className="py-2 pr-4">{run.status}</td>
-                    <td className="py-2 pr-4">{run.fetched_count ?? 0}</td>
-                    <td className="py-2 pr-4">{run.inserted_count ?? 0}</td>
+                    <td className="py-2 pr-4">{run.error ? "failed" : "ok"}</td>
+                    <td className="py-2 pr-4">{run.fetched}</td>
+                    <td className="py-2 pr-4">{run.upserted}</td>
                     <td className="py-2">{run.error ?? "—"}</td>
                   </tr>
                 ))}
