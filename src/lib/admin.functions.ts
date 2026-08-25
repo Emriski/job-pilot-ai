@@ -13,7 +13,7 @@ export const getSourceDashboard = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const [{ data: sources }, { data: runs }] = await Promise.all([
-      context.supabase.from("job_sources").select("*").order("label"),
+      context.supabase.from("job_sources").select("*").order("name"),
       context.supabase.from("job_source_runs").select("*").order("started_at", { ascending: false }).limit(30),
     ]);
     return { sources: sources ?? [], runs: runs ?? [] };
