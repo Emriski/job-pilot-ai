@@ -14,11 +14,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as VerifiedRouteImport } from './routes/verified'
+import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedJobsIndexRouteImport } from './routes/_authenticated/jobs.index'
+import { Route as AuthenticatedJobsJobIdRouteImport } from './routes/_authenticated/jobs.$jobId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -44,6 +46,12 @@ const VerifiedRoute = VerifiedRouteImport.update({
   path: '/verified',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedApplicationsRoute =
+  AuthenticatedApplicationsRouteImport.update({
+    id: '/applications',
+    path: '/applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -69,16 +77,23 @@ const AuthenticatedJobsIndexRoute = AuthenticatedJobsIndexRouteImport.update({
   path: '/jobs/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJobsJobIdRoute = AuthenticatedJobsJobIdRouteImport.update({
+  id: '/jobs/$jobId',
+  path: '/jobs/$jobId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verified': typeof VerifiedRoute
+  '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/resume': typeof AuthenticatedResumeRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/jobs/': typeof AuthenticatedJobsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -86,10 +101,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verified': typeof VerifiedRoute
+  '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/resume': typeof AuthenticatedResumeRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/jobs': typeof AuthenticatedJobsIndexRoute
 }
 export interface FileRoutesById {
@@ -99,10 +116,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verified': typeof VerifiedRoute
+  '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/_authenticated/jobs/': typeof AuthenticatedJobsIndexRoute
 }
 export interface FileRouteTypes {
@@ -112,10 +131,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/verified'
+    | '/applications'
     | '/dashboard'
     | '/onboarding'
     | '/resume'
     | '/saved'
+    | '/jobs/$jobId'
     | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -123,10 +144,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/verified'
+    | '/applications'
     | '/dashboard'
     | '/onboarding'
     | '/resume'
     | '/saved'
+    | '/jobs/$jobId'
     | '/jobs'
   id:
     | '__root__'
@@ -135,10 +158,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/verified'
+    | '/_authenticated/applications'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/_authenticated/resume'
     | '/_authenticated/saved'
+    | '/_authenticated/jobs/$jobId'
     | '/_authenticated/jobs/'
   fileRoutesById: FileRoutesById
 }
@@ -187,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/applications': {
+      id: '/_authenticated/applications'
+      path: '/applications'
+      fullPath: '/applications'
+      preLoaderRoute: typeof AuthenticatedApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -222,22 +254,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/jobs/$jobId': {
+      id: '/_authenticated/jobs/$jobId'
+      path: '/jobs/$jobId'
+      fullPath: '/jobs/$jobId'
+      preLoaderRoute: typeof AuthenticatedJobsJobIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+  AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
   AuthenticatedJobsIndexRoute: typeof AuthenticatedJobsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+  AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
   AuthenticatedJobsIndexRoute: AuthenticatedJobsIndexRoute,
 }
 
