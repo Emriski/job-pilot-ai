@@ -58,7 +58,7 @@ export async function buildDocument(
       content,
       meta,
     } as never)
-    .select("id, doc_type, title, content, meta, created_at")
+    .select("id, doc_type, title, content, changes, created_at")
     .single();
 
   if (error || !data) {
@@ -107,7 +107,7 @@ export async function buildPrepPack(supabase: SupabaseClient<Database>, userId: 
       content: pack.fitSummary,
       meta: pack,
     } as never)
-    .select("id, doc_type, title, content, meta, created_at")
+    .select("id, doc_type, title, content, changes, created_at")
     .single();
 
   return { pack, match, job, document: data };
