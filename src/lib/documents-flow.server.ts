@@ -52,13 +52,12 @@ export async function buildDocument(
     .insert({
       user_id: userId,
       job_id: jobId,
-      resume_id: resume.id,
       doc_type: docType,
       title,
       content,
-      meta,
+      changes: meta as never,
     } as never)
-    .select("id, doc_type, title, content, meta, created_at")
+    .select("id, doc_type, title, content, changes, created_at")
     .single();
 
   if (error || !data) {
@@ -101,13 +100,12 @@ export async function buildPrepPack(supabase: SupabaseClient<Database>, userId: 
     .insert({
       user_id: userId,
       job_id: jobId,
-      resume_id: resume.id,
       doc_type: "prep_pack",
       title: `Application plan — ${job.title} at ${job.company_name}`,
       content: pack.fitSummary,
-      meta: pack,
+      changes: pack as never,
     } as never)
-    .select("id, doc_type, title, content, meta, created_at")
+    .select("id, doc_type, title, content, changes, created_at")
     .single();
 
   return { pack, match, job, document: data };

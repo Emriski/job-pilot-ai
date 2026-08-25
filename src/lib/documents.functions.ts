@@ -21,7 +21,7 @@ export const listDocuments = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("documents")
-      .select("id, doc_type, title, content, meta, job_id, created_at")
+      .select("id, doc_type, title, content, changes, job_id, created_at")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     return data ?? [];
@@ -33,7 +33,7 @@ export const getJobDocuments = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: docs } = await context.supabase
       .from("documents")
-      .select("id, doc_type, title, content, meta, created_at")
+      .select("id, doc_type, title, content, changes, created_at")
       .eq("user_id", context.userId)
       .eq("job_id", data.jobId)
       .order("created_at", { ascending: false });
