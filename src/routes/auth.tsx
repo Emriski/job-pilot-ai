@@ -12,10 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { safeInternalPath } from "@/lib/security";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    redirect: typeof search["redirect"] === "string" ? search["redirect"] : undefined,
-    mode: search["mode"] === "signup" ? ("signup" as const) : ("signin" as const),
-  }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string; mode?: "signin" | "signup" } => {
+    const parsed: { redirect?: string; mode?: "signin" | "signup" } = {};
+    if (typeof search["redirect"] === "string") parsed.redirect = search["redirect"];
+    if (search["mode"] === "signup" || search["mode"] === "signin") parsed.mode = search["mode"];
+    return parsed;
+  },
   head: () => ({
     meta: [
       { title: "Sign in — JobePilotAI" },
@@ -32,7 +34,7 @@ function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const destination = safeInternalPath(search.redirect, "/dashboard");
-  const [mode, setMode] = useState<"signin" | "signup">(search.mode);
+  const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -65,7 +67,7 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: destination as "/dashboard", replace: true });
+        navigate({ to: destination as never, replace: true });
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
@@ -90,7 +92,7 @@ function AuthPage() {
         return;
       }
       if (result.redirected) return;
-      navigate({ to: destination as "/dashboard", replace: true });
+      navigate({ to: destination as never, replace: true });
     } finally {
       setBusy(false);
     }

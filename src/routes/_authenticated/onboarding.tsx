@@ -103,7 +103,7 @@ function OnboardingPage() {
   }
 
   return (
-    <AppShell isAdmin={contextQuery.data?.isAdmin}>
+    <AppShell isAdmin={Boolean(contextQuery.data?.isAdmin)}>
       <PageHeading
         title="Tell us what you're looking for"
         description="We use this to score your resume against the right roles and to rank real job listings for you. You can change any of it later in Settings."
@@ -113,8 +113,14 @@ function OnboardingPage() {
         className="grid gap-6 lg:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!form.full_name.trim()) return toast.error("Please enter your name.");
-          if (form.target_titles.length === 0) return toast.error("Add at least one target job title.");
+          if (!form.full_name.trim()) {
+            toast.error("Please enter your name.");
+            return;
+          }
+          if (form.target_titles.length === 0) {
+            toast.error("Add at least one target job title.");
+            return;
+          }
           mutation.mutate(form);
         }}
       >

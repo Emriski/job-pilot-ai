@@ -80,7 +80,7 @@ function ResetPasswordPage() {
                 Open this page from the reset link in your email. The link signs you in so you can set a new password.
               </p>
               <Button asChild variant="outline" className="w-full">
-                <Link to="/auth">Back to sign in</Link>
+                <Link to="/auth" search={{}}>Back to sign in</Link>
               </Button>
             </div>
           )}
