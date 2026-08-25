@@ -56,8 +56,8 @@ export async function buildDocument(
       doc_type: docType,
       title,
       content,
-      meta: meta as never,
-    })
+      meta,
+    } as never)
     .select("id, doc_type, title, content, meta, created_at")
     .single();
 
@@ -69,7 +69,7 @@ export async function buildDocument(
 }
 
 export async function buildPrepPack(supabase: SupabaseClient<Database>, userId: string, jobId: string) {
-  await enforceRateLimit(supabase, userId, "prep_pack");
+  await enforceRateLimit(supabase, userId, "application_prep");
   const { profile, resume, job } = await requireContext(supabase, userId, jobId);
 
   const match = computeMatch(buildMatchProfile(profile, resume), {
@@ -104,9 +104,9 @@ export async function buildPrepPack(supabase: SupabaseClient<Database>, userId: 
       resume_id: resume.id,
       doc_type: "prep_pack",
       title: `Application plan — ${job.title} at ${job.company_name}`,
-      content: pack.fit_summary,
-      meta: pack as never,
-    })
+      content: pack.fitSummary,
+      meta: pack,
+    } as never)
     .select("id, doc_type, title, content, meta, created_at")
     .single();
 
