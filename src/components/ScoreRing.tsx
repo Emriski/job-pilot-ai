@@ -24,32 +24,33 @@ export function ScoreRing({
   const { stroke, label } = tone(clamped);
 
   return (
-    <div className={cn("flex flex-col items-center gap-1", className)}>
-      <svg
-        width={size}
-        height={size}
-        role="img"
-        aria-label={`Score ${clamped} out of 100, rated ${label}`}
-        className="-rotate-90"
-      >
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={10} stroke="var(--color-muted)" />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          strokeWidth={10}
-          stroke={stroke}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference - (clamped / 100) * circumference}
-        />
-      </svg>
-      <div className="-mt-[calc(50%+0.5rem)] flex flex-col items-center" aria-hidden="true">
-        <span className="font-display text-3xl font-semibold leading-none text-foreground">{clamped}</span>
-        <span className="text-[0.65rem] font-semibold tracking-widest text-muted-foreground">{label}</span>
+    <div className={cn("flex flex-col items-center gap-2", className)}>
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg
+          width={size}
+          height={size}
+          role="img"
+          aria-label={`Score ${clamped} out of 100, rated ${label}`}
+          className="-rotate-90"
+        >
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={10} stroke="var(--color-muted)" />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            strokeWidth={10}
+            stroke={stroke}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - (clamped / 100) * circumference}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center" aria-hidden="true">
+          <span className="font-display text-3xl font-semibold leading-none text-foreground">{clamped}</span>
+          <span className="mt-1 text-[0.65rem] font-semibold tracking-widest text-muted-foreground">{label}</span>
+        </div>
       </div>
-      <div className="mt-[calc(50%-0.75rem)]" aria-hidden="true" />
       {caption ? <p className="text-xs text-muted-foreground">{caption}</p> : null}
     </div>
   );
