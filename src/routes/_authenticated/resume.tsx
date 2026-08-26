@@ -11,6 +11,7 @@ import { EmptyState, LoadingState } from "@/components/States";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { exampleRole } from "@/lib/professions";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyContext } from "@/lib/profile.functions";
@@ -322,7 +323,7 @@ function ResumePage() {
                   id="target-role"
                   value={targetRole}
                   maxLength={120}
-                  placeholder="Customer Support Representative"
+                  placeholder={`Any role, e.g. ${exampleRole()}`}
                   onChange={(event) => setTargetRole(event.target.value)}
                 />
               </div>
