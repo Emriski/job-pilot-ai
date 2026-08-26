@@ -93,7 +93,9 @@ export async function processUploadedResume(supabase: SupabaseClient, userId: st
   }
 
   const profile = await loadProfile(supabase, userId);
-  const targetRole = profile?.target_titles?.[0] ?? "General";
+  // The target role is always the user's own choice, falling back to the role
+  // detected in their resume. No profession is ever hard-coded here.
+  const targetRole = profile?.target_titles?.[0] ?? detectedTitle ?? "the role this resume is written for";
   const analysis = await runAnalysis(supabase, userId, resumeId, targetRole, rawText);
 
   return { resumeId, analysisId: analysis.id, targetRole };
