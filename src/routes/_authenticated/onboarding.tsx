@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AppShell, PageHeading } from "@/components/AppShell";
 import { LoadingState } from "@/components/States";
 import { TagInput } from "@/components/TagInput";
+import { exampleRoles } from "@/lib/professions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -161,7 +162,7 @@ function OnboardingPage() {
 
           <TagInput
             label="Target job titles"
-            hint="For example: Customer Support Representative"
+            hint={`Any profession or industry — e.g. ${exampleRoles(4).join(", ")}`}
             values={form.target_titles}
             onChange={(values) => setForm({ ...form, target_titles: values })}
           />

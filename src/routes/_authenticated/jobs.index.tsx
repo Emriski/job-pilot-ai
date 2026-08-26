@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { exampleRole } from "@/lib/professions";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -187,7 +188,7 @@ function JobsPage() {
                   id="q"
                   value={filters.query}
                   maxLength={160}
-                  placeholder="Customer Support Representative"
+                  placeholder={`e.g. ${exampleRole()}`}
                   onChange={(event) => setFilters({ ...filters, query: event.target.value })}
                 />
               </div>
