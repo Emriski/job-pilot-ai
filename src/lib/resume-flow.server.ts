@@ -78,8 +78,10 @@ export async function processUploadedResume(supabase: SupabaseClient, userId: st
 
   const resumeId = inserted.id as string;
 
+  let detectedTitle: string | null = null;
   try {
     const parsed = await extractStructuredResume(rawText);
+    detectedTitle = parsed.job_titles?.[0] ?? null;
     await supabase.from("resumes").update({ parsed, status: "ready" }).eq("id", resumeId).eq("user_id", userId);
   } catch (error) {
     console.error("[resume] extraction failed", error);
