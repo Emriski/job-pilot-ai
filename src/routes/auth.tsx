@@ -83,20 +83,47 @@ function AuthPage() {
 
   async function handleGoogle() {
     setBusy(true);
+    setNotice(null);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error("Google sign-in isn't available right now. Please use email and password.");
+      try {
+        window.sessionStorage.setItem("jobepilotai.oauth.redirect", destination);
+      } catch {
+        // Session storage may be unavailable; we fall back to /dashboard.
+      }
+
+      const host = window.location.hostname;
+      const onLovableHost = host.endsWith("lovable.app") || host.endsWith("lovable.dev") || host === "localhost";
+
+      if (onLovableHost) {
+        // Lovable-hosted origins proxy the managed OAuth broker paths.
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: `${window.location.origin}/oauth-callback`,
+        });
+        if (result.error) {
+          toast.error("Google sign-in isn't available right now. Please use email and password.");
+          return;
+        }
+        if (result.redirected) return;
+        navigate({ to: destination as never, replace: true });
         return;
       }
-      if (result.redirected) return;
-      navigate({ to: destination as never, replace: true });
+
+      // Any other origin (e.g. a custom/Vercel domain) goes straight to the
+      // auth provider's own OAuth endpoint — no broker path is involved.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/oauth-callback` },
+      });
+      if (error) {
+        toast.error("Google sign-in isn't available right now. Please use email and password.");
+      }
+    } catch {
+      toast.error("Google sign-in isn't available right now. Please use email and password.");
     } finally {
       setBusy(false);
     }
   }
+
 
   async function handleForgotPassword() {
     if (!email) {
