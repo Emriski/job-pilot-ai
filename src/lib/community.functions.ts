@@ -50,6 +50,32 @@ async function assertNotRestricted(
   }
 }
 
+/** Concrete, serializable shape for a job attached to a community post. */
+export type SharedJobSummary = {
+  id: string;
+  title: string;
+  company_name: string;
+  location: string | null;
+  remote: boolean;
+  application_url: string | null;
+  source: string | null;
+};
+
+function toSharedJob(value: unknown): SharedJobSummary | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v['id'] !== "string" || typeof v['title'] !== "string") return null;
+  return {
+    id: v['id'],
+    title: cleanText(v['title'], 160),
+    company_name: cleanText(v['company_name'], 160),
+    location: typeof v['location'] === "string" ? cleanText(v['location'], 160) : null,
+    remote: Boolean(v['remote']),
+    application_url: safeExternalUrl(v['application_url']),
+    source: typeof v['source'] === "string" ? cleanText(v['source'], 60) : null,
+  };
+}
+
 type PostRow = {
   id: string;
   user_id: string;
