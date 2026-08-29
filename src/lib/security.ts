@@ -3,6 +3,7 @@
  * AI output, user forms) passes through here before it is stored or displayed.
  */
 
+// eslint-disable-next-line no-control-regex -- intentional: stripping control chars is the point
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 /** Strip control characters and collapse absurd whitespace. Output is plain text. */
@@ -75,6 +76,7 @@ export function safeExternalUrl(input: unknown): string | null {
 export function safeInternalPath(input: unknown, fallback = "/dashboard"): string {
   if (typeof input !== "string") return fallback;
   if (!input.startsWith("/") || input.startsWith("//")) return fallback;
+  // eslint-disable-next-line no-control-regex -- intentional: reject control chars in paths
   if (/[\u0000-\u001F]/.test(input)) return fallback;
   return input;
 }

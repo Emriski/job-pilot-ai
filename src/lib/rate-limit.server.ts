@@ -6,7 +6,11 @@ export type RateLimitAction =
   | "job_search"
   | "job_sync"
   | "ai_document"
-  | "application_prep";
+  | "application_prep"
+  | "community_post"
+  | "community_comment"
+  | "community_message"
+  | "community_report";
 
 const LIMITS: Record<RateLimitAction, { max: number; windowMinutes: number }> = {
   resume_upload: { max: 10, windowMinutes: 60 },
@@ -15,6 +19,10 @@ const LIMITS: Record<RateLimitAction, { max: number; windowMinutes: number }> = 
   job_sync: { max: 12, windowMinutes: 60 },
   ai_document: { max: 25, windowMinutes: 60 },
   application_prep: { max: 15, windowMinutes: 60 },
+  community_post: { max: 15, windowMinutes: 60 },
+  community_comment: { max: 60, windowMinutes: 60 },
+  community_message: { max: 120, windowMinutes: 60 },
+  community_report: { max: 20, windowMinutes: 60 },
 };
 
 export class RateLimitError extends Error {
@@ -54,6 +62,8 @@ export async function enforceRateLimit(
     );
   }
 
-  const { error: insertError } = await supabase.from("rate_limits").insert({ user_id: userId, action });
+  const { error: insertError } = await supabase
+    .from("rate_limits")
+    .insert({ user_id: userId, action });
   if (insertError) console.error("[rate-limit] write failed", insertError.message);
 }

@@ -48,9 +48,15 @@ export async function extractStructuredResume(resumeText: string): Promise<Parse
     user: `Extract the resume below.\n\n${fenceUntrusted("RESUME", resumeText)}`,
   });
 
-  const experience = Array.isArray(raw["experience"]) ? (raw["experience"] as Record<string, unknown>[]) : [];
-  const education = Array.isArray(raw["education"]) ? (raw["education"] as Record<string, unknown>[]) : [];
-  const projects = Array.isArray(raw["projects"]) ? (raw["projects"] as Record<string, unknown>[]) : [];
+  const experience = Array.isArray(raw["experience"])
+    ? (raw["experience"] as Record<string, unknown>[])
+    : [];
+  const education = Array.isArray(raw["education"])
+    ? (raw["education"] as Record<string, unknown>[])
+    : [];
+  const projects = Array.isArray(raw["projects"])
+    ? (raw["projects"] as Record<string, unknown>[])
+    : [];
 
   const str = (value: unknown, max = 300) => {
     const text = cleanText(typeof value === "string" ? value : "", max);
@@ -88,7 +94,8 @@ export async function extractStructuredResume(resumeText: string): Promise<Parse
     })),
     achievements: toStringArray(raw["achievements"], 20, 400),
     languages: toStringArray(raw["languages"], 12, 60),
-    total_years_experience: Number.isFinite(years) && years >= 0 && years < 70 ? Math.round(years * 10) / 10 : null,
+    total_years_experience:
+      Number.isFinite(years) && years >= 0 && years < 70 ? Math.round(years * 10) / 10 : null,
     uncertain_fields: toStringArray(raw["uncertain_fields"], 15, 80),
   };
 }
@@ -140,7 +147,10 @@ Rules:
 - improvements must be concrete, rewritable actions the person can take with their real experience.
 - Never invent experience, employers, dates, degrees or certifications.`;
 
-export async function analyseResume(resumeText: string, targetRole: string): Promise<ResumeAnalysis> {
+export async function analyseResume(
+  resumeText: string,
+  targetRole: string,
+): Promise<ResumeAnalysis> {
   const raw = await chatJson<Record<string, unknown>>({
     model: "google/gemini-3.5-flash",
     system: ANALYSIS_SYSTEM,
@@ -154,7 +164,9 @@ export async function analyseResume(resumeText: string, targetRole: string): Pro
   const atsRaw = (raw["ats"] ?? {}) as Record<string, unknown>;
   const verdictRaw = cleanText(raw["verdict"], 30).toLowerCase();
   const verdict: ResumeAnalysis["verdict"] =
-    verdictRaw === "strong" || verdictRaw === "competitive" || verdictRaw === "weak" ? verdictRaw : "needs work";
+    verdictRaw === "strong" || verdictRaw === "competitive" || verdictRaw === "weak"
+      ? verdictRaw
+      : "needs work";
 
   const average = Math.round(
     CATEGORIES.reduce((sum, key) => sum + (category_scores[key] ?? 0), 0) / CATEGORIES.length,

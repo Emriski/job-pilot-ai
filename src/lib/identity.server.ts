@@ -85,7 +85,12 @@ const IMAGE_SIGNATURES: Array<{ ext: string; test: (bytes: Uint8Array) => boolea
   {
     ext: "webp",
     test: (b) =>
-      b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45,
+      b[0] === 0x52 &&
+      b[1] === 0x49 &&
+      b[2] === 0x46 &&
+      b[3] === 0x46 &&
+      b[8] === 0x57 &&
+      b[9] === 0x45,
   },
 ];
 

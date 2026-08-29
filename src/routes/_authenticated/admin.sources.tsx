@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/admin/sources")({
   head: () => ({
     meta: [
       { title: "Job sources — JobePilotAI admin" },
-      { name: "description", content: "Monitor connected job sources, sync status and listing counts." },
+      {
+        name: "description",
+        content: "Monitor connected job sources, sync status and listing counts.",
+      },
       { property: "og:title", content: "Job sources — JobePilotAI admin" },
       { property: "og:description", content: "Source health, sync runs and configuration." },
       { name: "robots", content: "noindex" },
@@ -32,7 +35,11 @@ function AdminSourcesPage() {
   const sync = useServerFn(runSourceSync);
 
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
-  const dashboardQuery = useQuery({ queryKey: ["admin-sources"], queryFn: () => load(), retry: false });
+  const dashboardQuery = useQuery({
+    queryKey: ["admin-sources"],
+    queryFn: () => load(),
+    retry: false,
+  });
 
   const toggleMutation = useMutation({
     mutationFn: (values: { slug: string; enabled: boolean }) => patch({ data: values }),
@@ -44,7 +51,9 @@ function AdminSourcesPage() {
     mutationFn: (slug: string | undefined) => sync({ data: slug ? { slug } : {} }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["admin-sources"] });
-      toast.success(`Sync finished — ${result.upserted} listings updated across ${result.sources.length} sources.`);
+      toast.success(
+        `Sync finished — ${result.upserted} listings updated across ${result.sources.length} sources.`,
+      );
     },
     onError: (error: Error) => toast.error(error.message || "The sync couldn't be completed."),
   });
@@ -84,25 +93,37 @@ function AdminSourcesPage() {
           <article key={source.slug} className="surface-panel p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="font-display text-base font-semibold text-foreground">{source.name}</h2>
+                <h2 className="font-display text-base font-semibold text-foreground">
+                  {source.name}
+                </h2>
                 <p className="text-xs text-muted-foreground">{source.slug}</p>
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant={source.enabled ? "secondary" : "outline"}>
-                  {(source.status === "requires_configuration") ? "Requires configuration" : source.enabled ? "Enabled" : "Disabled"}
+                  {source.status === "requires_configuration"
+                    ? "Requires configuration"
+                    : source.enabled
+                      ? "Enabled"
+                      : "Disabled"}
                 </Badge>
                 <Switch
                   checked={Boolean(source.enabled)}
-                  disabled={Boolean((source.status === "requires_configuration")) || toggleMutation.isPending}
+                  disabled={
+                    Boolean(source.status === "requires_configuration") || toggleMutation.isPending
+                  }
                   aria-label={`Enable ${source.name}`}
-                  onCheckedChange={(checked) => toggleMutation.mutate({ slug: source.slug, enabled: checked })}
+                  onCheckedChange={(checked) =>
+                    toggleMutation.mutate({ slug: source.slug, enabled: checked })
+                  }
                 />
               </div>
             </div>
 
             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-4">
               <div>
-                <dt className="text-xs uppercase tracking-wide text-muted-foreground">Live listings</dt>
+                <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Live listings
+                </dt>
                 <dd className="text-foreground">{source.job_count ?? 0}</dd>
               </div>
               <div>
@@ -116,14 +137,17 @@ function AdminSourcesPage() {
                 <dd className="text-foreground">{source.status ?? "Unknown"}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wide text-muted-foreground">Last error</dt>
+                <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Last error
+                </dt>
                 <dd className="text-foreground">{source.last_error ?? "None"}</dd>
               </div>
             </dl>
 
-            {(source.status === "requires_configuration") ? (
+            {source.status === "requires_configuration" ? (
               <p className="mt-3 text-xs text-muted-foreground">
-                This source has no public, permitted API. JobePilotAI does not scrape it or bypass its access rules.
+                This source has no public, permitted API. JobePilotAI does not scrape it or bypass
+                its access rules.
               </p>
             ) : (
               <Button

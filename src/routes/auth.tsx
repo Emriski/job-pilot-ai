@@ -12,7 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { safeInternalPath } from "@/lib/security";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { redirect?: string; mode?: "signin" | "signup" } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { redirect?: string; mode?: "signin" | "signup" } => {
     const parsed: { redirect?: string; mode?: "signin" | "signup" } = {};
     if (typeof search["redirect"] === "string") parsed.redirect = search["redirect"];
     if (search["mode"] === "signup" || search["mode"] === "signin") parsed.mode = search["mode"];
@@ -21,9 +23,16 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — JobePilotAI" },
-      { name: "description", content: "Sign in or create your JobePilotAI account to score your resume and find matching jobs." },
+      {
+        name: "description",
+        content:
+          "Sign in or create your JobePilotAI account to score your resume and find matching jobs.",
+      },
       { property: "og:title", content: "Sign in — JobePilotAI" },
-      { property: "og:description", content: "Access your resume score, job matches and applications." },
+      {
+        property: "og:description",
+        content: "Access your resume score, job matches and applications.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -92,7 +101,8 @@ function AuthPage() {
       }
 
       const host = window.location.hostname;
-      const onLovableHost = host.endsWith("lovable.app") || host.endsWith("lovable.dev") || host === "localhost";
+      const onLovableHost =
+        host.endsWith("lovable.app") || host.endsWith("lovable.dev") || host === "localhost";
 
       if (onLovableHost) {
         // Lovable-hosted origins proxy the managed OAuth broker paths.
@@ -123,7 +133,6 @@ function AuthPage() {
       setBusy(false);
     }
   }
-
 
   async function handleForgotPassword() {
     if (!email) {
@@ -161,7 +170,11 @@ function AuthPage() {
               : "Sign in to continue your job search."}
           </p>
 
-          <Tabs value={mode} onValueChange={(value) => setMode(value as "signin" | "signup")} className="mt-6">
+          <Tabs
+            value={mode}
+            onValueChange={(value) => setMode(value as "signin" | "signup")}
+            className="mt-6"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
               <TabsTrigger value="signup">Sign up</TabsTrigger>
@@ -214,7 +227,10 @@ function AuthPage() {
                 </div>
 
                 {notice ? (
-                  <p className="rounded-md bg-accent px-3 py-2 text-sm text-accent-foreground" role="status">
+                  <p
+                    className="rounded-md bg-accent px-3 py-2 text-sm text-accent-foreground"
+                    role="status"
+                  >
                     {notice}
                   </p>
                 ) : null}

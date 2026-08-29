@@ -18,7 +18,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Your dashboard — JobePilotAI" },
-      { name: "description", content: "Your resume score, recommended jobs, saved roles and application progress." },
+      {
+        name: "description",
+        content: "Your resume score, recommended jobs, saved roles and application progress.",
+      },
       { property: "og:title", content: "Your dashboard — JobePilotAI" },
       { property: "og:description", content: "Track your resume score, matches and applications." },
     ],
@@ -33,13 +36,17 @@ function DashboardPage() {
   const loadSaved = useServerFn(listSavedJobs);
 
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
-  const applicationsQuery = useQuery({ queryKey: ["applications"], queryFn: () => loadApplications() });
+  const applicationsQuery = useQuery({
+    queryKey: ["applications"],
+    queryFn: () => loadApplications(),
+  });
   const savedQuery = useQuery({ queryKey: ["saved-jobs"], queryFn: () => loadSaved() });
 
   const profile = contextQuery.data?.profile;
 
   useEffect(() => {
-    if (contextQuery.data && profile && !profile.onboarded) navigate({ to: "/onboarding", replace: true });
+    if (contextQuery.data && profile && !profile.onboarded)
+      navigate({ to: "/onboarding", replace: true });
   }, [contextQuery.data, profile, navigate]);
 
   if (contextQuery.isLoading) {
@@ -64,7 +71,9 @@ function DashboardPage() {
   return (
     <AppShell isAdmin={Boolean(contextQuery.data?.isAdmin)}>
       <PageHeading
-        title={profile?.full_name ? `Welcome back, ${profile.full_name.split(" ")[0]}` : "Welcome back"}
+        title={
+          profile?.full_name ? `Welcome back, ${profile.full_name.split(" ")[0]}` : "Welcome back"
+        }
         description="Everything you need to move your job search forward today."
         actions={
           <Button asChild>
@@ -78,7 +87,10 @@ function DashboardPage() {
           <h2 className="font-display text-base font-semibold">Resume score</h2>
           {analysis ? (
             <div className="mt-4 flex flex-col items-center gap-3 text-center">
-              <ScoreRing score={analysis.overall_score} caption={`Scored for ${analysis.target_role}`} />
+              <ScoreRing
+                score={analysis.overall_score}
+                caption={`Scored for ${analysis.target_role}`}
+              />
               <p className="text-sm text-muted-foreground">{analysis.summary}</p>
               <Button asChild variant="outline" size="sm">
                 <Link to="/resume">See full analysis</Link>
@@ -98,10 +110,30 @@ function DashboardPage() {
         </section>
 
         <section className="grid gap-5 sm:grid-cols-2 lg:col-span-2">
-          <StatCard label="Target role" value={profile?.target_titles?.[0] ?? "Not set"} icon={<Briefcase className="size-4" />} to="/settings" />
-          <StatCard label="Saved jobs" value={String(saved.length)} icon={<Bookmark className="size-4" />} to="/saved" />
-          <StatCard label="Applications sent" value={String(applied)} icon={<Search className="size-4" />} to="/applications" />
-          <StatCard label="Interviews & offers" value={String(interviews)} icon={<Briefcase className="size-4" />} to="/applications" />
+          <StatCard
+            label="Target role"
+            value={profile?.target_titles?.[0] ?? "Not set"}
+            icon={<Briefcase className="size-4" />}
+            to="/settings"
+          />
+          <StatCard
+            label="Saved jobs"
+            value={String(saved.length)}
+            icon={<Bookmark className="size-4" />}
+            to="/saved"
+          />
+          <StatCard
+            label="Applications sent"
+            value={String(applied)}
+            icon={<Search className="size-4" />}
+            to="/applications"
+          />
+          <StatCard
+            label="Interviews & offers"
+            value={String(interviews)}
+            icon={<Briefcase className="size-4" />}
+            to="/applications"
+          />
         </section>
       </div>
 
@@ -126,7 +158,9 @@ function DashboardPage() {
                     <p className="truncate text-xs text-muted-foreground">{item.company_name}</p>
                   </div>
                   <Badge variant="secondary">
-                    {APPLICATION_STATUSES.includes(item.status as never) ? titleCase(item.status) : "Saved"}
+                    {APPLICATION_STATUSES.includes(item.status as never)
+                      ? titleCase(item.status)
+                      : "Saved"}
                   </Badge>
                 </li>
               ))}
@@ -158,7 +192,11 @@ function DashboardPage() {
                 if (!job) return null;
                 return (
                   <li key={item.id} className="py-3">
-                    <Link to="/jobs/$jobId" params={{ jobId: job.id }} className="text-sm font-medium hover:underline">
+                    <Link
+                      to="/jobs/$jobId"
+                      params={{ jobId: job.id }}
+                      className="text-sm font-medium hover:underline"
+                    >
                       {job.title}
                     </Link>
                     <p className="text-xs text-muted-foreground">{job.company_name}</p>
@@ -185,7 +223,10 @@ function StatCard({
   to: "/settings" | "/saved" | "/applications";
 }) {
   return (
-    <Link to={to} className="surface-panel flex flex-col gap-2 p-5 transition-colors hover:border-primary/40">
+    <Link
+      to={to}
+      className="surface-panel flex flex-col gap-2 p-5 transition-colors hover:border-primary/40"
+    >
       <span className="flex items-center gap-2 text-sm text-muted-foreground">
         {icon}
         {label}

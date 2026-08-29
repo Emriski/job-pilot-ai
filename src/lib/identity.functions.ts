@@ -24,23 +24,23 @@ export const getMyIdentity = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("profiles")
-      .select("id, nickname, avatar_path, headline, career_interests, location, show_location, public_profile, skills, target_titles")
+      .select(
+        "id, nickname, avatar_path, headline, career_interests, location, show_location, public_profile, skills, target_titles",
+      )
       .eq("id", context.userId)
       .maybeSingle();
-    const row = data as
-      | {
-          id: string;
-          nickname: string | null;
-          avatar_path: string | null;
-          headline: string | null;
-          career_interests: string[];
-          location: string | null;
-          show_location: boolean;
-          public_profile: boolean;
-          skills: string[];
-          target_titles: string[];
-        }
-      | null;
+    const row = data as {
+      id: string;
+      nickname: string | null;
+      avatar_path: string | null;
+      headline: string | null;
+      career_interests: string[];
+      location: string | null;
+      show_location: boolean;
+      public_profile: boolean;
+      skills: string[];
+      target_titles: string[];
+    } | null;
     if (!row) return null;
     return { ...row, avatarUrl: await signAvatar(context.supabase, row.avatar_path) };
   });
@@ -51,7 +51,11 @@ export const checkNickname = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const problem = validateNickname(data.nickname);
     if (problem) {
-      return { available: false, message: nicknameProblemMessage(problem)!, suggestions: [] as string[] };
+      return {
+        available: false,
+        message: nicknameProblemMessage(problem)!,
+        suggestions: [] as string[],
+      };
     }
     const normalized = normalizeNickname(data.nickname);
     const { data: existing } = await context.supabase
@@ -84,8 +88,10 @@ export const claimNickname = createServerFn({ method: "POST" })
       if (message.includes("nickname_taken")) {
         throw new Error("That nickname is already taken. Please choose another.");
       }
-      if (message.includes("reserved_nickname")) throw new Error("That nickname is reserved. Please choose another.");
-      if (message.includes("invalid_nickname")) throw new Error("Use 3–30 letters, numbers or underscores.");
+      if (message.includes("reserved_nickname"))
+        throw new Error("That nickname is reserved. Please choose another.");
+      if (message.includes("invalid_nickname"))
+        throw new Error("Use 3–30 letters, numbers or underscores.");
       console.error("[identity] nickname claim failed", message);
       throw new Error("We couldn't save that nickname. Please try again.");
     }
@@ -165,48 +171,57 @@ export const removeAvatar = createServerFn({ method: "POST" })
 
 export const getPublicProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ nickname: z.string().trim().min(1).max(40) }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ nickname: z.string().trim().min(1).max(40) }).parse(data),
+  )
   .handler(async ({ data, context }) => {
     const normalized = normalizeNickname(data.nickname);
     const { data: row } = await context.supabase
       .from("profiles")
-      .select("id, nickname, avatar_path, headline, skills, career_interests, target_titles, location, show_location, public_profile, created_at")
+      .select(
+        "id, nickname, avatar_path, headline, skills, career_interests, target_titles, location, show_location, public_profile, created_at",
+      )
       .eq("normalized_nickname", normalized)
       .maybeSingle();
-    const profile = row as
-      | {
-          id: string;
-          nickname: string;
-          avatar_path: string | null;
-          headline: string | null;
-          skills: string[];
-          career_interests: string[];
-          target_titles: string[];
-          location: string | null;
-          show_location: boolean;
-          public_profile: boolean;
-          created_at: string;
-        }
-      | null;
+    const profile = row as {
+      id: string;
+      nickname: string;
+      avatar_path: string | null;
+      headline: string | null;
+      skills: string[];
+      career_interests: string[];
+      target_titles: string[];
+      location: string | null;
+      show_location: boolean;
+      public_profile: boolean;
+      created_at: string;
+    } | null;
     if (!profile) return null;
 
-    const [{ data: posts }, { count: followers }, { count: following }, { data: isFollowing }] = await Promise.all([
-      context.supabase
-        .from("community_posts")
-        .select("id, title, category, created_at, comment_count, reaction_count")
-        .eq("user_id", profile.id)
-        .eq("status", "published")
-        .order("created_at", { ascending: false })
-        .limit(20),
-      context.supabase.from("user_follows").select("id", { count: "exact", head: true }).eq("following_id", profile.id),
-      context.supabase.from("user_follows").select("id", { count: "exact", head: true }).eq("follower_id", profile.id),
-      context.supabase
-        .from("user_follows")
-        .select("id")
-        .eq("follower_id", context.userId)
-        .eq("following_id", profile.id)
-        .maybeSingle(),
-    ]);
+    const [{ data: posts }, { count: followers }, { count: following }, { data: isFollowing }] =
+      await Promise.all([
+        context.supabase
+          .from("community_posts")
+          .select("id, title, category, created_at, comment_count, reaction_count")
+          .eq("user_id", profile.id)
+          .eq("status", "published")
+          .order("created_at", { ascending: false })
+          .limit(20),
+        context.supabase
+          .from("user_follows")
+          .select("id", { count: "exact", head: true })
+          .eq("following_id", profile.id),
+        context.supabase
+          .from("user_follows")
+          .select("id", { count: "exact", head: true })
+          .eq("follower_id", profile.id),
+        context.supabase
+          .from("user_follows")
+          .select("id")
+          .eq("follower_id", context.userId)
+          .eq("following_id", profile.id)
+          .maybeSingle(),
+      ]);
 
     return {
       id: profile.id,
@@ -228,7 +243,9 @@ export const getPublicProfile = createServerFn({ method: "POST" })
 
 export const searchPeople = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ query: z.string().trim().max(60).default("") }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ query: z.string().trim().max(60).default("") }).parse(data),
+  )
   .handler(async ({ data, context }) => {
     let request = context.supabase
       .from("profiles")

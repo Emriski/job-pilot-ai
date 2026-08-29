@@ -14,7 +14,9 @@ export const generateDocument = createServerFn({ method: "POST" })
 export const prepareApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => jobIdSchema.parse(data))
-  .handler(async ({ data, context }) => buildPrepPack(context.supabase, context.userId, data.jobId));
+  .handler(async ({ data, context }) =>
+    buildPrepPack(context.supabase, context.userId, data.jobId),
+  );
 
 export const listDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -60,6 +62,10 @@ export const deleteDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => idSchema.parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("documents").delete().eq("id", data.id).eq("user_id", context.userId);
+    await context.supabase
+      .from("documents")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     return { ok: true };
   });

@@ -62,7 +62,9 @@ export const createAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => alertInputSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("job_alerts").insert({ ...data, user_id: context.userId });
+    const { error } = await context.supabase
+      .from("job_alerts")
+      .insert({ ...data, user_id: context.userId });
     if (error) {
       console.error("[alerts] create failed", error.message);
       throw new Error("We couldn't create that alert. Please try again.");
@@ -74,7 +76,11 @@ export const deleteAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => idSchema.parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("job_alerts").delete().eq("id", data.id).eq("user_id", context.userId);
+    await context.supabase
+      .from("job_alerts")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     return { ok: true };
   });
 
@@ -83,7 +89,10 @@ export const deleteMyData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: resumes } = await supabase.from("resumes").select("file_path").eq("user_id", userId);
+    const { data: resumes } = await supabase
+      .from("resumes")
+      .select("file_path")
+      .eq("user_id", userId);
     const paths = (resumes ?? []).map((row) => row.file_path).filter(Boolean);
     if (paths.length) await supabase.storage.from("resumes").remove(paths);
 

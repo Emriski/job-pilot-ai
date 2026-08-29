@@ -32,10 +32,17 @@ export async function refreshCatalogue(supabase: SupabaseClient<Database>, userI
 
 export type Recommendation = { job: JobListItem; match: MatchResult };
 
-export async function recommendJobs(supabase: SupabaseClient<Database>, userId: string, refresh: boolean) {
+export async function recommendJobs(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  refresh: boolean,
+) {
   await enforceRateLimit(supabase, userId, "job_search");
 
-  const [profile, resume] = await Promise.all([loadProfile(supabase, userId), loadActiveResume(supabase, userId)]);
+  const [profile, resume] = await Promise.all([
+    loadProfile(supabase, userId),
+    loadActiveResume(supabase, userId),
+  ]);
   const matchProfile = buildMatchProfile(profile, resume);
 
   if (refresh) {
@@ -73,7 +80,11 @@ export async function recommendJobs(supabase: SupabaseClient<Database>, userId: 
   };
 }
 
-export async function matchForJob(supabase: SupabaseClient<Database>, userId: string, jobId: string) {
+export async function matchForJob(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  jobId: string,
+) {
   const [profile, resume, job] = await Promise.all([
     loadProfile(supabase, userId),
     loadActiveResume(supabase, userId),

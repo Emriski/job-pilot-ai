@@ -62,7 +62,9 @@ export async function generateTailoredResume(resumeText: string, job: JobContext
     system: TAILOR_SYSTEM,
     user: `Tailor this resume for the job.\n\n${jobBlock(job)}\n\n${fenceUntrusted("RESUME", resumeText)}`,
   });
-  const changesRaw = Array.isArray(raw["changes"]) ? (raw["changes"] as Record<string, unknown>[]) : [];
+  const changesRaw = Array.isArray(raw["changes"])
+    ? (raw["changes"] as Record<string, unknown>[])
+    : [];
   return {
     content: cleanText(raw["content"], 20000),
     changes: changesRaw.slice(0, 20).map((item) => ({
@@ -87,7 +89,9 @@ export async function generatePrepPack(resumeText: string, job: JobContext) {
     system: PREP_SYSTEM,
     user: `Prepare the application pack.\n\n${jobBlock(job)}\n\n${fenceUntrusted("RESUME", resumeText)}`,
   });
-  const questionsRaw = Array.isArray(raw["likely_questions"]) ? (raw["likely_questions"] as Record<string, unknown>[]) : [];
+  const questionsRaw = Array.isArray(raw["likely_questions"])
+    ? (raw["likely_questions"] as Record<string, unknown>[])
+    : [];
   return {
     fitSummary: cleanText(raw["fit_summary"], 1500),
     checklist: toStringArray(raw["checklist"], 12, 300),

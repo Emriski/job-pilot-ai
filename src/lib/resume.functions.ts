@@ -6,13 +6,18 @@ import { idSchema, processResumeSchema, reanalyseSchema, updateParsedSchema } fr
 
 export const createResumeUploadTarget = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { extension: string }) => ({ extension: data.extension === "docx" ? "docx" : "pdf" }) as const)
+  .inputValidator(
+    (data: { extension: string }) =>
+      ({ extension: data.extension === "docx" ? "docx" : "pdf" }) as const,
+  )
   .handler(async ({ data, context }) => createSignedResumeUpload(context.userId, data.extension));
 
 export const processResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => processResumeSchema.parse(data))
-  .handler(async ({ data, context }) => processUploadedResume(context.supabase, context.userId, data));
+  .handler(async ({ data, context }) =>
+    processUploadedResume(context.supabase, context.userId, data),
+  );
 
 export const reanalyseResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

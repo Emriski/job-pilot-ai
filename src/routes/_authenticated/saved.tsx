@@ -14,7 +14,10 @@ export const Route = createFileRoute("/_authenticated/saved")({
   head: () => ({
     meta: [
       { title: "Saved jobs — JobePilotAI" },
-      { name: "description", content: "The roles you've shortlisted, ready to prepare and apply for." },
+      {
+        name: "description",
+        content: "The roles you've shortlisted, ready to prepare and apply for.",
+      },
       { property: "og:title", content: "Saved jobs — JobePilotAI" },
       { property: "og:description", content: "Your shortlisted roles in one place." },
     ],
@@ -43,7 +46,10 @@ function SavedPage() {
 
   return (
     <AppShell isAdmin={Boolean(contextQuery.data?.isAdmin)}>
-      <PageHeading title="Saved jobs" description="Roles you've shortlisted. Prepare an application when you're ready." />
+      <PageHeading
+        title="Saved jobs"
+        description="Roles you've shortlisted. Prepare an application when you're ready."
+      />
 
       {savedQuery.isLoading ? (
         <LoadingState message="Loading your saved jobs..." />

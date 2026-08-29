@@ -15,14 +15,24 @@ import { exampleRole } from "@/lib/professions";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyContext } from "@/lib/profile.functions";
-import { createResumeUploadTarget, deleteResume, getResumeDetail, processResume, reanalyseResume } from "@/lib/resume.functions";
+import {
+  createResumeUploadTarget,
+  deleteResume,
+  getResumeDetail,
+  processResume,
+  reanalyseResume,
+} from "@/lib/resume.functions";
 import { titleCase } from "@/lib/formatters";
 
 export const Route = createFileRoute("/_authenticated/resume")({
   head: () => ({
     meta: [
       { title: "Resume analysis — JobePilotAI" },
-      { name: "description", content: "Upload your resume and get an honest 0-100 score with ATS feedback for your target role." },
+      {
+        name: "description",
+        content:
+          "Upload your resume and get an honest 0-100 score with ATS feedback for your target role.",
+      },
       { property: "og:title", content: "Resume analysis — JobePilotAI" },
       { property: "og:description", content: "Honest resume scoring and ATS feedback." },
     ],
@@ -58,14 +68,20 @@ function ResumePage() {
       const extension = file.name.toLowerCase().endsWith(".docx") ? "docx" : "pdf";
       setStep(STEPS[0]!);
       const target = await createTarget({ data: { extension } });
-      const upload = await supabase.storage.from("resumes").uploadToSignedUrl(target.path, target.token, file);
+      const upload = await supabase.storage
+        .from("resumes")
+        .uploadToSignedUrl(target.path, target.token, file);
       if (upload.error) throw new Error("We couldn't upload that file. Please try again.");
       setStep(STEPS[1]!);
       const result = await process({
         data: {
           filePath: target.path,
           originalFilename: file.name,
-          mimeType: file.type || (extension === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+          mimeType:
+            file.type ||
+            (extension === "pdf"
+              ? "application/pdf"
+              : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
           sizeBytes: file.size,
         },
       });
@@ -79,7 +95,9 @@ function ResumePage() {
     },
     onError: (error: Error) => {
       setStep(null);
-      toast.error(error.message || "We couldn't safely read this file. Please upload a valid PDF or DOCX.");
+      toast.error(
+        error.message || "We couldn't safely read this file. Please upload a valid PDF or DOCX.",
+      );
     },
   });
 
@@ -90,7 +108,8 @@ function ResumePage() {
       await queryClient.invalidateQueries({ queryKey: ["me"] });
       toast.success("Scored against that role.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't complete the analysis. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't complete the analysis. Please try again."),
   });
 
   const deleteMutation = useMutation({
@@ -139,7 +158,13 @@ function ResumePage() {
     | undefined;
 
   const parsed = resume?.parsed as
-    | { name?: string; email?: string; skills?: string[]; job_titles?: string[]; uncertain_fields?: string[] }
+    | {
+        name?: string;
+        email?: string;
+        skills?: string[];
+        job_titles?: string[];
+        uncertain_fields?: string[];
+      }
     | null
     | undefined;
 
@@ -166,7 +191,10 @@ function ResumePage() {
               description="PDF or DOCX up to 8MB. We validate every file before reading it, and nothing inside a document is ever executed."
               icon={<Upload className="size-6" aria-hidden="true" />}
               action={
-                <Button onClick={() => inputRef.current?.click()} disabled={uploadMutation.isPending}>
+                <Button
+                  onClick={() => inputRef.current?.click()}
+                  disabled={uploadMutation.isPending}
+                >
                   Upload resume
                 </Button>
               }
@@ -176,9 +204,12 @@ function ResumePage() {
               <section className="surface-panel p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h2 className="font-display text-base font-semibold">{resume.original_filename}</h2>
+                    <h2 className="font-display text-base font-semibold">
+                      {resume.original_filename}
+                    </h2>
                     <p className="text-sm text-muted-foreground">
-                      Uploaded {new Date(resume.created_at).toLocaleDateString()} · {Math.round((resume.size_bytes ?? 0) / 1024)} KB
+                      Uploaded {new Date(resume.created_at).toLocaleDateString()} ·{" "}
+                      {Math.round((resume.size_bytes ?? 0) / 1024)} KB
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -199,7 +230,10 @@ function ResumePage() {
                 {parsed ? (
                   <dl className="mt-4 grid gap-3 sm:grid-cols-2">
                     <Detail label="Name detected" value={parsed.name || "Not detected"} />
-                    <Detail label="Recent titles" value={parsed.job_titles?.slice(0, 3).join(", ") || "Not detected"} />
+                    <Detail
+                      label="Recent titles"
+                      value={parsed.job_titles?.slice(0, 3).join(", ") || "Not detected"}
+                    />
                     <div className="sm:col-span-2">
                       <dt className="text-sm text-muted-foreground">Skills found</dt>
                       <dd className="mt-1 flex flex-wrap gap-1.5">
@@ -219,10 +253,13 @@ function ResumePage() {
 
                 {parsed?.uncertain_fields?.length ? (
                   <p className="mt-4 flex items-start gap-2 rounded-md bg-warning/10 p-3 text-sm text-foreground">
-                    <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+                    <AlertTriangle
+                      className="mt-0.5 size-4 shrink-0 text-warning"
+                      aria-hidden="true"
+                    />
                     <span>
-                      We weren't fully confident about: {parsed.uncertain_fields.join(", ")}. Double-check these before
-                      applying.
+                      We weren't fully confident about: {parsed.uncertain_fields.join(", ")}.
+                      Double-check these before applying.
                     </span>
                   </p>
                 ) : null}
@@ -246,7 +283,11 @@ function ResumePage() {
 
                   <div className="mt-6 grid gap-5 sm:grid-cols-2">
                     <FeedbackList title="What's working" items={latest.strengths} tone="good" />
-                    <FeedbackList title="What's holding it back" items={latest.weaknesses} tone="bad" />
+                    <FeedbackList
+                      title="What's holding it back"
+                      items={latest.weaknesses}
+                      tone="bad"
+                    />
                   </div>
 
                   <div className="mt-5">
@@ -262,11 +303,25 @@ function ResumePage() {
 
               {latest?.ats ? (
                 <section className="surface-panel p-5">
-                  <h2 className="font-display text-base font-semibold">ATS check for {latest.target_role}</h2>
+                  <h2 className="font-display text-base font-semibold">
+                    ATS check for {latest.target_role}
+                  </h2>
                   <div className="mt-4 grid gap-5 sm:grid-cols-2">
-                    <KeywordBlock title="Keywords already present" items={latest.ats.present_keywords} tone="good" />
-                    <KeywordBlock title="Important keywords missing" items={latest.ats.missing_keywords} tone="bad" />
-                    <FeedbackList title="Needs stronger evidence" items={latest.ats.weak_evidence} tone="warn" />
+                    <KeywordBlock
+                      title="Keywords already present"
+                      items={latest.ats.present_keywords}
+                      tone="good"
+                    />
+                    <KeywordBlock
+                      title="Important keywords missing"
+                      items={latest.ats.missing_keywords}
+                      tone="bad"
+                    />
+                    <FeedbackList
+                      title="Needs stronger evidence"
+                      items={latest.ats.weak_evidence}
+                      tone="warn"
+                    />
                     <FeedbackList
                       title="Formatting and parsing risks"
                       items={[...latest.ats.formatting_issues, ...latest.ats.parsing_risks]}
@@ -284,7 +339,10 @@ function ResumePage() {
                   </p>
                   <ul className="mt-3 divide-y divide-border">
                     {analyses.map((item) => (
-                      <li key={item.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                      <li
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 py-2.5 text-sm"
+                      >
                         <span className="text-foreground">{item.target_role}</span>
                         <span className="font-display font-semibold">{item.overall_score}/100</span>
                       </li>
@@ -334,10 +392,15 @@ function ResumePage() {
           </section>
 
           <section className="surface-panel p-5 text-sm text-muted-foreground">
-            <h2 className="font-display text-base font-semibold text-foreground">How we handle your file</h2>
+            <h2 className="font-display text-base font-semibold text-foreground">
+              How we handle your file
+            </h2>
             <ul className="mt-3 space-y-2">
               <li>Your resume is private to your account and never published.</li>
-              <li>We check the extension, MIME type and the real file signature before reading anything.</li>
+              <li>
+                We check the extension, MIME type and the real file signature before reading
+                anything.
+              </li>
               <li>Nothing inside a document is ever executed — we only read text.</li>
               <li>You can delete your resume and all generated documents at any time.</li>
             </ul>
@@ -372,7 +435,15 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FeedbackList({ title, items, tone }: { title: string; items: string[]; tone: "good" | "bad" | "warn" }) {
+function FeedbackList({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "good" | "bad" | "warn";
+}) {
   if (!items?.length) return null;
   const marker = tone === "good" ? "✓" : tone === "bad" ? "✗" : "⚠";
   return (
@@ -390,7 +461,15 @@ function FeedbackList({ title, items, tone }: { title: string; items: string[]; 
   );
 }
 
-function KeywordBlock({ title, items, tone }: { title: string; items: string[]; tone: "good" | "bad" }) {
+function KeywordBlock({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "good" | "bad";
+}) {
   return (
     <div>
       <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">

@@ -29,8 +29,11 @@ export function formatSalary(job: {
   const max = job.salary_max ?? null;
   if (!min && !max) return "Salary not disclosed";
   const currency = job.salary_currency || "USD";
-  const period = job.salary_period ? ` / ${SALARY_PERIOD_LABEL[job.salary_period] ?? job.salary_period}` : "";
-  if (min && max && min !== max) return `${money(min, currency)} – ${money(max, currency)}${period}`;
+  const period = job.salary_period
+    ? ` / ${SALARY_PERIOD_LABEL[job.salary_period] ?? job.salary_period}`
+    : "";
+  if (min && max && min !== max)
+    return `${money(min, currency)} – ${money(max, currency)}${period}`;
   return `${money((min ?? max) as number, currency)}${period}`;
 }
 
@@ -47,7 +50,11 @@ export function formatPosted(value?: string | null): string {
   return `${Math.floor(days / 30)} months ago`;
 }
 
-export function formatLocation(job: { location?: string | null; remote?: boolean; remote_type?: string | null }): string {
+export function formatLocation(job: {
+  location?: string | null;
+  remote?: boolean;
+  remote_type?: string | null;
+}): string {
   if (job.location) return job.location;
   if (job.remote) return "Remote";
   return "Location not provided";

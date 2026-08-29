@@ -6,7 +6,6 @@ import type { ParsedResume } from "./resume-analysis.server";
 export type ProfileRow = {
   id: string;
   full_name: string | null;
-  email: string | null;
   onboarded: boolean;
   target_titles: string[];
   employment_types: string[];
@@ -29,12 +28,18 @@ export type ActiveResume = {
   created_at: string;
 };
 
-export async function loadProfile(supabase: SupabaseClient, userId: string): Promise<ProfileRow | null> {
-  const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+export async function loadProfile(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ProfileRow | null> {
+  const { data } = await supabase.from("profiles").select("id, full_name, onboarded, target_titles, employment_types, work_modes, countries, min_salary, salary_period, salary_currency, experience_level, industries, skills").eq("id", userId).maybeSingle();
   return (data as ProfileRow | null) ?? null;
 }
 
-export async function loadActiveResume(supabase: SupabaseClient, userId: string): Promise<ActiveResume | null> {
+export async function loadActiveResume(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ActiveResume | null> {
   const { data } = await supabase
     .from("resumes")
     .select("id, raw_text, parsed, status, original_filename, created_at")
@@ -46,7 +51,10 @@ export async function loadActiveResume(supabase: SupabaseClient, userId: string)
   return (data as ActiveResume | null) ?? null;
 }
 
-export function buildMatchProfile(profile: ProfileRow | null, resume: ActiveResume | null): MatchProfile {
+export function buildMatchProfile(
+  profile: ProfileRow | null,
+  resume: ActiveResume | null,
+): MatchProfile {
   const parsed = resume?.parsed ?? null;
   const resumeSkills = parsed?.skills ?? [];
   return {

@@ -11,7 +11,13 @@ import { exampleRoles } from "@/lib/professions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getMyContext, saveProfile } from "@/lib/profile.functions";
 import {
@@ -28,9 +34,15 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
       { title: "Set up your job preferences — JobePilotAI" },
-      { name: "description", content: "Tell JobePilotAI what roles, salary and work setup you're targeting." },
+      {
+        name: "description",
+        content: "Tell JobePilotAI what roles, salary and work setup you're targeting.",
+      },
       { property: "og:title", content: "Set up your job preferences — JobePilotAI" },
-      { property: "og:description", content: "Target roles, salary expectations and work preferences." },
+      {
+        property: "og:description",
+        content: "Target roles, salary expectations and work preferences.",
+      },
     ],
   }),
   component: OnboardingPage,
@@ -65,7 +77,9 @@ function OnboardingPage() {
     setForm({
       full_name: profile.full_name ?? "",
       target_titles: profile.target_titles ?? [],
-      employment_types: (profile.employment_types ?? ["full-time"]) as ProfileInput["employment_types"],
+      employment_types: (profile.employment_types ?? [
+        "full-time",
+      ]) as ProfileInput["employment_types"],
       work_modes: (profile.work_modes ?? ["remote"]) as ProfileInput["work_modes"],
       countries: profile.countries ?? [],
       min_salary: profile.min_salary ?? null,
@@ -84,7 +98,8 @@ function OnboardingPage() {
       toast.success("Preferences saved.");
       navigate({ to: "/resume" });
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't save your preferences. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't save your preferences. Please try again."),
   });
 
   function toggle<K extends "employment_types" | "work_modes">(key: K, value: string) {
@@ -189,7 +204,10 @@ function OnboardingPage() {
             <div className="flex flex-wrap gap-4">
               {WORK_MODES.map((mode) => (
                 <label key={mode} className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={form.work_modes.includes(mode)} onCheckedChange={() => toggle("work_modes", mode)} />
+                  <Checkbox
+                    checked={form.work_modes.includes(mode)}
+                    onCheckedChange={() => toggle("work_modes", mode)}
+                  />
                   {titleCase(mode)}
                 </label>
               ))}
@@ -228,7 +246,10 @@ function OnboardingPage() {
                 inputMode="numeric"
                 value={form.min_salary ?? ""}
                 onChange={(event) =>
-                  setForm({ ...form, min_salary: event.target.value === "" ? null : Number(event.target.value) })
+                  setForm({
+                    ...form,
+                    min_salary: event.target.value === "" ? null : Number(event.target.value),
+                  })
                 }
               />
             </div>
@@ -236,7 +257,9 @@ function OnboardingPage() {
               <Label htmlFor="salary_period">Per</Label>
               <Select
                 value={form.salary_period}
-                onValueChange={(value) => setForm({ ...form, salary_period: value as ProfileInput["salary_period"] })}
+                onValueChange={(value) =>
+                  setForm({ ...form, salary_period: value as ProfileInput["salary_period"] })
+                }
               >
                 <SelectTrigger id="salary_period">
                   <SelectValue />
@@ -272,8 +295,9 @@ function OnboardingPage() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            We always store the period explicitly, so {form.salary_currency} {form.min_salary ?? "300"} means{" "}
-            {form.salary_currency} {form.min_salary ?? "300"} per {form.salary_period.replace("ly", "")} — never a guess.
+            We always store the period explicitly, so {form.salary_currency}{" "}
+            {form.min_salary ?? "300"} means {form.salary_currency} {form.min_salary ?? "300"} per{" "}
+            {form.salary_period.replace("ly", "")} — never a guess.
           </p>
 
           <Button type="submit" className="w-full" disabled={mutation.isPending}>

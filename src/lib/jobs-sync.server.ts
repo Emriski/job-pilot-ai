@@ -15,7 +15,10 @@ export type SyncSummary = {
 export async function syncAllSources(onlySlug?: string): Promise<SyncSummary> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  let query = supabaseAdmin.from("job_sources").select("slug, config, enabled, status").eq("enabled", true);
+  let query = supabaseAdmin
+    .from("job_sources")
+    .select("slug, config, enabled, status")
+    .eq("enabled", true);
   if (onlySlug) query = query.eq("slug", onlySlug);
   const { data: sources, error } = await query;
   if (error) throw new Error(error.message);
@@ -38,7 +41,11 @@ export async function syncAllSources(onlySlug?: string): Promise<SyncSummary> {
     const result = results[index];
     if (result?.status === "fulfilled") {
       collected.push(...result.value.jobs);
-      summary.push({ slug: source.slug, fetched: result.value.jobs.length, error: result.value.error });
+      summary.push({
+        slug: source.slug,
+        fetched: result.value.jobs.length,
+        error: result.value.error,
+      });
     } else {
       summary.push({ slug: source.slug, fetched: 0, error: "Source request failed." });
     }
@@ -48,7 +55,9 @@ export async function syncAllSources(onlySlug?: string): Promise<SyncSummary> {
   let upserted = 0;
 
   for (let offset = 0; offset < deduped.length; offset += 200) {
-    const batch = deduped.slice(offset, offset + 200).map((job) => ({ ...job, last_synced_at: startedAt, expired: false }));
+    const batch = deduped
+      .slice(offset, offset + 200)
+      .map((job) => ({ ...job, last_synced_at: startedAt, expired: false }));
     const { error: upsertError, count } = await supabaseAdmin
       .from("jobs")
       .upsert(batch, { onConflict: "dedupe_key", count: "exact" });

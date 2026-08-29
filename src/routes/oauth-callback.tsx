@@ -91,7 +91,9 @@ function OAuthCallbackPage() {
         <div className="surface-panel w-full max-w-md p-6 text-center sm:p-8">
           {error ? (
             <>
-              <h1 className="font-display text-xl font-semibold text-foreground">Sign-in didn't complete</h1>
+              <h1 className="font-display text-xl font-semibold text-foreground">
+                Sign-in didn't complete
+              </h1>
               <p className="mt-2 text-sm text-muted-foreground">{error}</p>
               <Button asChild className="mt-6">
                 <Link to="/auth" search={{}}>
@@ -101,7 +103,9 @@ function OAuthCallbackPage() {
             </>
           ) : (
             <>
-              <h1 className="font-display text-xl font-semibold text-foreground">Signing you in...</h1>
+              <h1 className="font-display text-xl font-semibold text-foreground">
+                Signing you in...
+              </h1>
               <p className="mt-2 text-sm text-muted-foreground" role="status">
                 Finishing your Google sign-in.
               </p>

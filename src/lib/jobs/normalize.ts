@@ -1,10 +1,15 @@
 import { cleanText, htmlToPlainText, safeExternalUrl } from "../security";
 import type { NormalizedJob } from "./types";
 
-const COMMON_SUFFIXES = /\b(inc|llc|ltd|limited|gmbh|bv|corp|corporation|co|plc|sa|ag|srl|pte|pty)\b\.?/g;
+const COMMON_SUFFIXES =
+  /\b(inc|llc|ltd|limited|gmbh|bv|corp|corporation|co|plc|sa|ag|srl|pte|pty)\b\.?/g;
 
 export function normalizeCompany(value: string): string {
-  return cleanText(value, 120).toLowerCase().replace(COMMON_SUFFIXES, "").replace(/[^a-z0-9]+/g, " ").trim();
+  return cleanText(value, 120)
+    .toLowerCase()
+    .replace(COMMON_SUFFIXES, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 const TITLE_NOISE =
@@ -21,7 +26,10 @@ export function normalizeTitle(value: string): string {
 }
 
 export function buildDedupeKey(company: string, title: string, location: string | null): string {
-  const loc = cleanText(location ?? "", 80).toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 24);
+  const loc = cleanText(location ?? "", 80)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 24);
   return `${normalizeCompany(company)}|${normalizeTitle(title)}|${loc}`.slice(0, 300);
 }
 
@@ -69,11 +77,16 @@ export function detectExperienceLevel(...values: Array<string | null | undefined
  * "Worldwide" is only claimed when the source says so explicitly.
  * Everything else keeps the literal location the source provided.
  */
-export function describeRemote(location: string | null, raw?: string | null): { remote: boolean; remote_type: string | null } {
+export function describeRemote(
+  location: string | null,
+  raw?: string | null,
+): { remote: boolean; remote_type: string | null } {
   const haystack = `${location ?? ""} ${raw ?? ""}`.toLowerCase();
   if (/\bhybrid\b/.test(haystack)) return { remote: false, remote_type: "hybrid" };
-  if (/\b(remote|anywhere|worldwide|distributed)\b/.test(haystack)) return { remote: true, remote_type: "remote" };
-  if (/\b(on[\s-]?site|in[\s-]?office|in[\s-]?person)\b/.test(haystack)) return { remote: false, remote_type: "onsite" };
+  if (/\b(remote|anywhere|worldwide|distributed)\b/.test(haystack))
+    return { remote: true, remote_type: "remote" };
+  if (/\b(on[\s-]?site|in[\s-]?office|in[\s-]?person)\b/.test(haystack))
+    return { remote: false, remote_type: "onsite" };
   return { remote: false, remote_type: null };
 }
 
@@ -94,7 +107,10 @@ export function positiveNumber(value: unknown): number | null {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-type BuildArgs = Omit<Partial<NormalizedJob>, "source" | "title" | "company_name" | "application_url"> & {
+type BuildArgs = Omit<
+  Partial<NormalizedJob>,
+  "source" | "title" | "company_name" | "application_url"
+> & {
   source: string;
   source_job_id: string;
   title: string;
@@ -130,15 +146,20 @@ export function buildJob(args: BuildArgs): NormalizedJob | null {
     country: args.country ? cleanText(args.country, 80) : null,
     remote: remote.remote,
     remote_type: remote.remote_type,
-    employment_type: args.employment_type ?? detectEmploymentType(title, description.slice(0, 2000)),
-    experience_level: args.experience_level ?? detectExperienceLevel(title, description.slice(0, 2000)),
+    employment_type:
+      args.employment_type ?? detectEmploymentType(title, description.slice(0, 2000)),
+    experience_level:
+      args.experience_level ?? detectExperienceLevel(title, description.slice(0, 2000)),
     salary_min: args.salary_min ?? null,
     salary_max: args.salary_max ?? null,
     salary_currency: args.salary_currency ? cleanText(args.salary_currency, 8).toUpperCase() : null,
     salary_period: args.salary_period ?? null,
     description: description || null,
     requirements: args.requirements ? cleanText(args.requirements, 6000) : null,
-    skills: (args.skills ?? []).map((skill) => cleanText(skill, 60)).filter(Boolean).slice(0, 25),
+    skills: (args.skills ?? [])
+      .map((skill) => cleanText(skill, 60))
+      .filter(Boolean)
+      .slice(0, 25),
     posted_at: args.posted_at ?? null,
     application_url: applicationUrl,
     source_url: safeExternalUrl(args.source_url) ?? applicationUrl,
