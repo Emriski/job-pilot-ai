@@ -6,7 +6,6 @@ import type { ParsedResume } from "./resume-analysis.server";
 export type ProfileRow = {
   id: string;
   full_name: string | null;
-  email: string | null;
   onboarded: boolean;
   target_titles: string[];
   employment_types: string[];
@@ -33,7 +32,7 @@ export async function loadProfile(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<ProfileRow | null> {
-  const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+  const { data } = await supabase.from("profiles").select("id, full_name, onboarded, target_titles, employment_types, work_modes, countries, min_salary, salary_period, salary_currency, experience_level, industries, skills").eq("id", userId).maybeSingle();
   return (data as ProfileRow | null) ?? null;
 }
 
