@@ -13,7 +13,8 @@ export function publicSupabase(): SupabaseClient<Database> {
     global: {
       fetch: (input, init) => {
         const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
+        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+          headers.delete("Authorization");
         headers.set("apikey", key);
         return fetch(input, { ...init, headers });
       },
@@ -95,7 +96,9 @@ export async function searchJobsQuery(input: JobSearchInput, client?: SupabaseCl
   }
 
   const from = (input.page - 1) * input.pageSize;
-  query = query.order("posted_at", { ascending: false, nullsFirst: false }).range(from, from + input.pageSize - 1);
+  query = query
+    .order("posted_at", { ascending: false, nullsFirst: false })
+    .range(from, from + input.pageSize - 1);
 
   const { data, error, count } = await query;
   if (error) {
@@ -108,7 +111,11 @@ export async function searchJobsQuery(input: JobSearchInput, client?: SupabaseCl
 
 export async function getJobRow(jobId: string, client?: SupabaseClient<Database>) {
   const supabase = client ?? publicSupabase();
-  const { data, error } = await supabase.from("jobs").select(JOB_COLUMNS).eq("id", jobId).maybeSingle();
+  const { data, error } = await supabase
+    .from("jobs")
+    .select(JOB_COLUMNS)
+    .eq("id", jobId)
+    .maybeSingle();
   if (error) {
     console.error("[jobs] fetch failed", error.message);
     throw new Error("We couldn't load this job right now. Please try again.");

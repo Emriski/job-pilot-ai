@@ -16,7 +16,9 @@ export const getJob = createServerFn({ method: "POST" })
 export const getRecommendations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { refresh?: boolean }) => ({ refresh: Boolean(data?.refresh) }))
-  .handler(async ({ data, context }) => recommendJobs(context.supabase, context.userId, data.refresh));
+  .handler(async ({ data, context }) =>
+    recommendJobs(context.supabase, context.userId, data.refresh),
+  );
 
 export const getJobMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -44,7 +46,10 @@ export const saveJob = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("saved_jobs")
-      .upsert({ user_id: context.userId, job_id: data.jobId, notes: data.notes }, { onConflict: "user_id,job_id" });
+      .upsert(
+        { user_id: context.userId, job_id: data.jobId, notes: data.notes },
+        { onConflict: "user_id,job_id" },
+      );
     if (error) {
       console.error("[jobs] save failed", error.message);
       throw new Error("We couldn't save that job. Please try again.");
@@ -56,7 +61,11 @@ export const unsaveJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => jobIdSchema.parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("saved_jobs").delete().eq("user_id", context.userId).eq("job_id", data.jobId);
+    await context.supabase
+      .from("saved_jobs")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("job_id", data.jobId);
     return { ok: true };
   });
 
@@ -64,7 +73,11 @@ export const removeSavedJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => idSchema.parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("saved_jobs").delete().eq("user_id", context.userId).eq("id", data.id);
+    await context.supabase
+      .from("saved_jobs")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("id", data.id);
     return { ok: true };
   });
 

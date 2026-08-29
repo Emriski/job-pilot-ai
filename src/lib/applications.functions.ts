@@ -31,7 +31,11 @@ export const createApplication = createServerFn({ method: "POST" })
       follow_up_date: data.follow_up_date,
       applied_at: data.status === "applied" ? new Date().toISOString() : null,
     };
-    const { data: row, error } = await context.supabase.from("applications").insert(payload).select("*").single();
+    const { data: row, error } = await context.supabase
+      .from("applications")
+      .insert(payload)
+      .select("*")
+      .single();
     if (error) {
       console.error("[applications] create failed", error.message);
       throw new Error("We couldn't add that application. Please try again.");
@@ -64,6 +68,10 @@ export const deleteApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => idSchema.parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("applications").delete().eq("id", data.id).eq("user_id", context.userId);
+    await context.supabase
+      .from("applications")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     return { ok: true };
   });

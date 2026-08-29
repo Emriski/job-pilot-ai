@@ -103,13 +103,19 @@ const WWR_FEEDS = [
 ];
 
 function rssItems(xml: string): string[] {
-  return xml.split(/<item>/i).slice(1).map((chunk) => chunk.split(/<\/item>/i)[0] ?? "");
+  return xml
+    .split(/<item>/i)
+    .slice(1)
+    .map((chunk) => chunk.split(/<\/item>/i)[0] ?? "");
 }
 
 function rssField(chunk: string, tag: string): string {
   const match = chunk.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
   if (!match?.[1]) return "";
-  return match[1].replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "").trim();
+  return match[1]
+    .replace(/^<!\[CDATA\[/, "")
+    .replace(/\]\]>$/, "")
+    .trim();
 }
 
 async function fetchWeWorkRemotely(): Promise<NormalizedJob[]> {
@@ -171,12 +177,16 @@ async function fetchRemoteJobsOrg(): Promise<NormalizedJob[]> {
     url?: string;
     apply_url?: string;
   };
-  const payload = await fetchJson<{ jobs?: Item[]; data?: Item[] } | Item[]>("https://remotejobs.org/api/jobs");
+  const payload = await fetchJson<{ jobs?: Item[]; data?: Item[] } | Item[]>(
+    "https://remotejobs.org/api/jobs",
+  );
   const items = Array.isArray(payload) ? payload : (payload.jobs ?? payload.data ?? []);
   return items
     .map((item) => {
       const company =
-        typeof item.company === "string" ? item.company : (item.company?.name ?? item.company_name ?? "");
+        typeof item.company === "string"
+          ? item.company
+          : (item.company?.name ?? item.company_name ?? "");
       return buildJob({
         source: "remotejobs",
         source_job_id: String(item.id ?? item.slug ?? item.url ?? ""),
@@ -219,7 +229,9 @@ async function fetchArbeitnow(): Promise<NormalizedJob[]> {
   };
   const jobs: NormalizedJob[] = [];
   for (const page of [1, 2]) {
-    const payload = await fetchJson<{ data?: Item[] }>(`https://www.arbeitnow.com/api/job-board-api?page=${page}`);
+    const payload = await fetchJson<{ data?: Item[] }>(
+      `https://www.arbeitnow.com/api/job-board-api?page=${page}`,
+    );
     for (const item of payload.data ?? []) {
       const job = buildJob({
         source: "arbeitnow",
@@ -273,7 +285,9 @@ async function fetchHimalayas(): Promise<NormalizedJob[]> {
         title: item.title ?? "",
         company_name: item.companyName ?? "",
         company_logo: item.companyLogo ?? null,
-        location: item.locationRestrictions?.length ? item.locationRestrictions.join(", ") : "Remote",
+        location: item.locationRestrictions?.length
+          ? item.locationRestrictions.join(", ")
+          : "Remote",
         remote: true,
         remote_type: "remote",
         descriptionHtml: item.description ?? item.excerpt ?? null,
@@ -320,7 +334,9 @@ async function fetchGreenhouse(boards: string[]): Promise<NormalizedJob[]> {
   );
   for (const result of results) {
     if (result.status !== "fulfilled") continue;
-    const company = result.value.board.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const company = result.value.board
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
     for (const item of result.value.payload.jobs ?? []) {
       const job = buildJob({
         source: "greenhouse",
@@ -402,7 +418,9 @@ async function fetchAshby(boards: string[]): Promise<NormalizedJob[]> {
         salary_min: positiveNumber(salary?.minValue),
         salary_max: positiveNumber(salary?.maxValue),
         salary_currency: salary?.currencyCode ?? null,
-        salary_period: salary?.interval ? (intervalMap[salary.interval.replace("PER_", "")] ?? null) : null,
+        salary_period: salary?.interval
+          ? (intervalMap[salary.interval.replace("PER_", "")] ?? null)
+          : null,
         posted_at: toIsoDate(item.publishedAt),
         application_url: item.applyUrl ?? item.jobUrl ?? "",
         source_url: item.jobUrl ?? null,
@@ -429,7 +447,9 @@ async function fetchLever(boards: string[]): Promise<NormalizedJob[]> {
   const results = await Promise.allSettled(
     boards.map(async (board) => ({
       board,
-      payload: await fetchJson<Item[]>(`https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`),
+      payload: await fetchJson<Item[]>(
+        `https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`,
+      ),
     })),
   );
   for (const result of results) {
@@ -447,7 +467,9 @@ async function fetchLever(boards: string[]): Promise<NormalizedJob[]> {
         description: item.descriptionPlain ?? null,
         descriptionHtml: item.descriptionPlain ? null : (item.description ?? null),
         employment_type: item.categories?.commitment ?? null,
-        skills: [item.categories?.team, item.categories?.department].filter((v): v is string => Boolean(v)),
+        skills: [item.categories?.team, item.categories?.department].filter((v): v is string =>
+          Boolean(v),
+        ),
         posted_at: toIsoDate(item.createdAt),
         application_url: item.applyUrl ?? item.hostedUrl ?? "",
         source_url: item.hostedUrl ?? null,
@@ -465,7 +487,10 @@ type SourceConfig = { slug: string; config: Record<string, unknown> };
 function boardList(config: Record<string, unknown>, key: string, fallback: string[]): string[] {
   const value = config[key];
   if (Array.isArray(value) && value.length) {
-    return value.map((item) => cleanText(String(item), 60).toLowerCase()).filter(Boolean).slice(0, 20);
+    return value
+      .map((item) => cleanText(String(item), 60).toLowerCase())
+      .filter(Boolean)
+      .slice(0, 20);
   }
   return fallback;
 }

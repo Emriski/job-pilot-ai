@@ -11,9 +11,21 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SALARY_PERIODS } from "@/lib/validation";
-import { createAlert, deleteAlert, deleteMyData, getMyContext, listAlerts } from "@/lib/profile.functions";
+import {
+  createAlert,
+  deleteAlert,
+  deleteMyData,
+  getMyContext,
+  listAlerts,
+} from "@/lib/profile.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { titleCase } from "@/lib/formatters";
 
@@ -21,9 +33,15 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings — JobePilotAI" },
-      { name: "description", content: "Manage your job preferences, job alerts, privacy and account data." },
+      {
+        name: "description",
+        content: "Manage your job preferences, job alerts, privacy and account data.",
+      },
       { property: "og:title", content: "Settings — JobePilotAI" },
-      { property: "og:description", content: "Preferences, alerts and data controls for your JobePilotAI account." },
+      {
+        property: "og:description",
+        content: "Preferences, alerts and data controls for your JobePilotAI account.",
+      },
     ],
   }),
   component: SettingsPage,
@@ -69,7 +87,8 @@ function SettingsPage() {
       setAlertForm({ ...alertForm, label: "", query: "", min_salary: "" });
       toast.success("Alert saved.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't create that alert. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't create that alert. Please try again."),
   });
 
   const deleteDataMutation = useMutation({
@@ -95,7 +114,10 @@ function SettingsPage() {
 
   return (
     <AppShell isAdmin={Boolean(contextQuery.data?.isAdmin)}>
-      <PageHeading title="Settings" description="Your preferences, alerts, privacy and account controls." />
+      <PageHeading
+        title="Settings"
+        description="Your preferences, alerts, privacy and account controls."
+      />
 
       <div className="space-y-6">
         <section className="surface-panel p-5">
@@ -117,8 +139,12 @@ function SettingsPage() {
               <dd className="text-sm text-foreground">{profile?.full_name || "Not set"}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-muted-foreground">Target roles</dt>
-              <dd className="text-sm text-foreground">{profile?.target_titles?.join(", ") || "Not set"}</dd>
+              <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                Target roles
+              </dt>
+              <dd className="text-sm text-foreground">
+                {profile?.target_titles?.join(", ") || "Not set"}
+              </dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-wide text-muted-foreground">Work modes</dt>
@@ -127,7 +153,9 @@ function SettingsPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-muted-foreground">Minimum salary</dt>
+              <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                Minimum salary
+              </dt>
               <dd className="text-sm text-foreground">
                 {profile?.min_salary
                   ? `${profile.salary_currency ?? "USD"} ${Number(profile.min_salary).toLocaleString()} per ${profile.salary_period ?? "month"}`
@@ -140,7 +168,8 @@ function SettingsPage() {
         <section className="surface-panel p-5">
           <h2 className="font-display text-base font-semibold">Job alerts</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Saved searches you can re-run at any time. We only alert on real listings from connected sources.
+            Saved searches you can re-run at any time. We only alert on real listings from connected
+            sources.
           </p>
 
           <form
@@ -187,7 +216,10 @@ function SettingsPage() {
               <Select
                 value={alertForm.salary_period}
                 onValueChange={(value) =>
-                  setAlertForm({ ...alertForm, salary_period: value as (typeof SALARY_PERIODS)[number] })
+                  setAlertForm({
+                    ...alertForm,
+                    salary_period: value as (typeof SALARY_PERIODS)[number],
+                  })
                 }
               >
                 <SelectTrigger id="alert-period">
@@ -206,11 +238,17 @@ function SettingsPage() {
               <Checkbox
                 id="alert-remote"
                 checked={alertForm.remote_only}
-                onCheckedChange={(checked) => setAlertForm({ ...alertForm, remote_only: checked === true })}
+                onCheckedChange={(checked) =>
+                  setAlertForm({ ...alertForm, remote_only: checked === true })
+                }
               />
               <Label htmlFor="alert-remote">Remote roles only</Label>
             </div>
-            <Button type="submit" disabled={createAlertMutation.isPending} className="sm:col-span-2">
+            <Button
+              type="submit"
+              disabled={createAlertMutation.isPending}
+              className="sm:col-span-2"
+            >
               Save alert
             </Button>
           </form>
@@ -218,7 +256,10 @@ function SettingsPage() {
           {alerts.length ? (
             <ul className="mt-5 space-y-2">
               {alerts.map((alert) => (
-                <li key={alert.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3">
+                <li
+                  key={alert.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3"
+                >
                   <div>
                     <p className="text-sm font-medium text-foreground">{alert.label}</p>
                     <p className="text-xs text-muted-foreground">
@@ -254,8 +295,13 @@ function SettingsPage() {
           <h2 className="font-display text-base font-semibold">Privacy and your data</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>Your resume file is stored privately and is only readable by your account.</li>
-            <li>Resume text is used to score jobs and draft documents for you — nothing is shared publicly.</li>
-            <li>Job listings come from public sources and always link back to the original posting.</li>
+            <li>
+              Resume text is used to score jobs and draft documents for you — nothing is shared
+              publicly.
+            </li>
+            <li>
+              Job listings come from public sources and always link back to the original posting.
+            </li>
           </ul>
           {contextQuery.data?.isAdmin ? (
             <Badge className="mt-3" variant="secondary">
@@ -267,8 +313,9 @@ function SettingsPage() {
         <section className="surface-panel border-destructive/40 p-5">
           <h2 className="font-display text-base font-semibold text-destructive">Delete my data</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Permanently removes your resume files, analyses, matches, saved jobs, documents, applications and alerts.
-            This cannot be undone. Type <span className="font-medium text-foreground">DELETE</span> to confirm.
+            Permanently removes your resume files, analyses, matches, saved jobs, documents,
+            applications and alerts. This cannot be undone. Type{" "}
+            <span className="font-medium text-foreground">DELETE</span> to confirm.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Input

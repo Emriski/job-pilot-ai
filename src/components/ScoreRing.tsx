@@ -33,7 +33,14 @@ export function ScoreRing({
           aria-label={`Score ${clamped} out of 100, rated ${label}`}
           className="-rotate-90"
         >
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={10} stroke="var(--color-muted)" />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            strokeWidth={10}
+            stroke="var(--color-muted)"
+          />
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -46,9 +53,16 @@ export function ScoreRing({
             strokeDashoffset={circumference - (clamped / 100) * circumference}
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center" aria-hidden="true">
-          <span className="font-display text-3xl font-semibold leading-none text-foreground">{clamped}</span>
-          <span className="mt-1 text-[0.65rem] font-semibold tracking-widest text-muted-foreground">{label}</span>
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center"
+          aria-hidden="true"
+        >
+          <span className="font-display text-3xl font-semibold leading-none text-foreground">
+            {clamped}
+          </span>
+          <span className="mt-1 text-[0.65rem] font-semibold tracking-widest text-muted-foreground">
+            {label}
+          </span>
         </div>
       </div>
       {caption ? <p className="text-xs text-muted-foreground">{caption}</p> : null}
@@ -66,7 +80,10 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
         <span className="font-medium text-foreground">{clamped}</span>
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full transition-all" style={{ width: `${clamped}%`, backgroundColor: stroke }} />
+        <div
+          className="h-full rounded-full transition-all"
+          style={{ width: `${clamped}%`, backgroundColor: stroke }}
+        />
       </div>
     </div>
   );

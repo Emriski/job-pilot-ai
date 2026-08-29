@@ -54,7 +54,9 @@ function ResetPasswordPage() {
       </header>
       <div className="container-page flex flex-1 items-start justify-center pb-16">
         <div className="surface-panel w-full max-w-md p-6 sm:p-8">
-          <h1 className="font-display text-2xl font-semibold text-foreground">Choose a new password</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">
+            Choose a new password
+          </h1>
           {ready ? (
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="space-y-1.5">
@@ -77,10 +79,13 @@ function ResetPasswordPage() {
           ) : (
             <div className="mt-4 space-y-4">
               <p className="text-sm text-muted-foreground">
-                Open this page from the reset link in your email. The link signs you in so you can set a new password.
+                Open this page from the reset link in your email. The link signs you in so you can
+                set a new password.
               </p>
               <Button asChild variant="outline" className="w-full">
-                <Link to="/auth" search={{}}>Back to sign in</Link>
+                <Link to="/auth" search={{}}>
+                  Back to sign in
+                </Link>
               </Button>
             </div>
           )}

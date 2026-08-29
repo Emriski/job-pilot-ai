@@ -28,7 +28,9 @@ function VerifiedPage() {
       <div className="container-page flex flex-1 items-start justify-center pb-16">
         <div className="surface-panel w-full max-w-md p-8 text-center">
           <CheckCircle2 className="mx-auto size-10 text-success" aria-hidden="true" />
-          <h1 className="mt-4 font-display text-2xl font-semibold text-foreground">Email verified successfully.</h1>
+          <h1 className="mt-4 font-display text-2xl font-semibold text-foreground">
+            Email verified successfully.
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             You can continue in JobePilotAI whenever you're ready.
           </p>

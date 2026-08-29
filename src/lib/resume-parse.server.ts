@@ -25,10 +25,15 @@ export function detectFileKind(bytes: Uint8Array): DetectedKind {
   if (bytes.length < 8) throw new ResumeFileError(UNREADABLE);
 
   // %PDF-
-  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return "pdf";
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46)
+    return "pdf";
 
   // PK zip container — must actually be an OOXML wordprocessing document.
-  if (bytes[0] === 0x50 && bytes[1] === 0x4b && (bytes[2] === 0x03 || bytes[2] === 0x05 || bytes[2] === 0x07)) {
+  if (
+    bytes[0] === 0x50 &&
+    bytes[1] === 0x4b &&
+    (bytes[2] === 0x03 || bytes[2] === 0x05 || bytes[2] === 0x07)
+  ) {
     let entries: Record<string, Uint8Array>;
     try {
       entries = unzipSync(bytes);
@@ -42,19 +47,30 @@ export function detectFileKind(bytes: Uint8Array): DetectedKind {
   throw new ResumeFileError(UNREADABLE);
 }
 
-export function validateUpload(bytes: Uint8Array, declaredMime: string, filename: string): DetectedKind {
-  if (bytes.length === 0) throw new ResumeFileError("That file is empty. Please upload a valid PDF or DOCX.");
-  if (bytes.length > MAX_RESUME_BYTES) throw new ResumeFileError("That file is larger than 8MB. Please upload a smaller PDF or DOCX.");
+export function validateUpload(
+  bytes: Uint8Array,
+  declaredMime: string,
+  filename: string,
+): DetectedKind {
+  if (bytes.length === 0)
+    throw new ResumeFileError("That file is empty. Please upload a valid PDF or DOCX.");
+  if (bytes.length > MAX_RESUME_BYTES)
+    throw new ResumeFileError("That file is larger than 8MB. Please upload a smaller PDF or DOCX.");
 
   const kind = detectFileKind(bytes);
   const extension = filename.toLowerCase().split(".").pop() ?? "";
   const allowedMimes =
     kind === "pdf"
       ? ["application/pdf", "application/x-pdf", ""]
-      : ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/octet-stream", ""];
+      : [
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/octet-stream",
+          "",
+        ];
 
   if (extension && extension !== kind) throw new ResumeFileError(UNREADABLE);
-  if (declaredMime && !allowedMimes.includes(declaredMime.toLowerCase())) throw new ResumeFileError(UNREADABLE);
+  if (declaredMime && !allowedMimes.includes(declaredMime.toLowerCase()))
+    throw new ResumeFileError(UNREADABLE);
 
   return kind;
 }
@@ -83,7 +99,6 @@ export async function extractResumeText(bytes: Uint8Array, kind: DetectedKind): 
       const entry = entries[name];
       if (entry) parts.push(strFromU8(entry));
     }
-
 
     const xml = parts.join("\n");
     const text = xml

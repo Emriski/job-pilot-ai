@@ -2,7 +2,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { enforceRateLimit } from "./rate-limit.server";
 import { analyseResume, extractStructuredResume } from "./resume-analysis.server";
-import { assertUsableText, extractResumeText, validateUpload, ResumeFileError } from "./resume-parse.server";
+import {
+  assertUsableText,
+  extractResumeText,
+  validateUpload,
+  ResumeFileError,
+} from "./resume-parse.server";
 import { displayFilename, safeStorageName } from "./security";
 import { loadProfile } from "./user-context.server";
 
@@ -25,7 +30,11 @@ type ProcessArgs = {
   sizeBytes: number;
 };
 
-export async function processUploadedResume(supabase: SupabaseClient, userId: string, args: ProcessArgs) {
+export async function processUploadedResume(
+  supabase: SupabaseClient,
+  userId: string,
+  args: ProcessArgs,
+) {
   await enforceRateLimit(supabase, userId, "resume_upload");
 
   // The client can only ever act inside its own folder.
@@ -54,7 +63,11 @@ export async function processUploadedResume(supabase: SupabaseClient, userId: st
     throw new Error("We couldn't safely read this file. Please upload a valid PDF or DOCX.");
   }
 
-  await supabase.from("resumes").update({ is_active: false }).eq("user_id", userId).eq("is_active", true);
+  await supabase
+    .from("resumes")
+    .update({ is_active: false })
+    .eq("user_id", userId)
+    .eq("is_active", true);
 
   const { data: inserted, error: insertError } = await supabase
     .from("resumes")
@@ -82,7 +95,11 @@ export async function processUploadedResume(supabase: SupabaseClient, userId: st
   try {
     const parsed = await extractStructuredResume(rawText);
     detectedTitle = parsed.job_titles?.[0] ?? null;
-    await supabase.from("resumes").update({ parsed, status: "ready" }).eq("id", resumeId).eq("user_id", userId);
+    await supabase
+      .from("resumes")
+      .update({ parsed, status: "ready" })
+      .eq("id", resumeId)
+      .eq("user_id", userId);
   } catch (error) {
     console.error("[resume] extraction failed", error);
     await supabase
@@ -95,7 +112,8 @@ export async function processUploadedResume(supabase: SupabaseClient, userId: st
   const profile = await loadProfile(supabase, userId);
   // The target role is always the user's own choice, falling back to the role
   // detected in their resume. No profession is ever hard-coded here.
-  const targetRole = profile?.target_titles?.[0] ?? detectedTitle ?? "the role this resume is written for";
+  const targetRole =
+    profile?.target_titles?.[0] ?? detectedTitle ?? "the role this resume is written for";
   const analysis = await runAnalysis(supabase, userId, resumeId, targetRole, rawText);
 
   return { resumeId, analysisId: analysis.id, targetRole };

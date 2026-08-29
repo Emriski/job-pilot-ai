@@ -37,17 +37,27 @@ type ChatArgs = {
 };
 
 function userMessageForStatus(status: number, providerMessage?: string): string {
-  if (status === 429) return "JobePilotAI is handling a lot of requests right now. Please try again in a moment.";
+  if (status === 429)
+    return "JobePilotAI is handling a lot of requests right now. Please try again in a moment.";
   if (status === 402)
-    return providerMessage?.trim() || "AI credits for this workspace are exhausted. Please add credits to continue.";
+    return (
+      providerMessage?.trim() ||
+      "AI credits for this workspace are exhausted. Please add credits to continue."
+    );
   if (status === 403)
     return providerMessage?.trim() || "AI features are currently disabled for this workspace.";
   if (status === 401) return "AI is not configured correctly. Please contact support.";
-  if (status === 400) return "We couldn't complete the analysis for this document. Please try again.";
+  if (status === 400)
+    return "We couldn't complete the analysis for this document. Please try again.";
   return "We couldn't complete the analysis. Please try again.";
 }
 
-async function callGateway({ model = "google/gemini-3.5-flash", system, user, maxTokens }: ChatArgs) {
+async function callGateway({
+  model = "google/gemini-3.5-flash",
+  system,
+  user,
+  maxTokens,
+}: ChatArgs) {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new AiError(401, userMessageForStatus(401), "LOVABLE_API_KEY missing");
 
@@ -75,7 +85,11 @@ async function callGateway({ model = "google/gemini-3.5-flash", system, user, ma
       providerMessage = undefined;
     }
     console.error("[ai] gateway error", response.status, providerMessage);
-    throw new AiError(response.status, userMessageForStatus(response.status, providerMessage), providerMessage);
+    throw new AiError(
+      response.status,
+      userMessageForStatus(response.status, providerMessage),
+      providerMessage,
+    );
   }
 
   const json = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
@@ -104,7 +118,11 @@ export async function chatText(args: ChatArgs): Promise<string> {
 }
 
 export function parseJsonLoose<T>(raw: string): T {
-  const trimmed = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+  const trimmed = raw
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/, "")
+    .trim();
   try {
     return JSON.parse(trimmed) as T;
   } catch {
@@ -113,6 +131,10 @@ export function parseJsonLoose<T>(raw: string): T {
     if (start >= 0 && end > start) {
       return JSON.parse(trimmed.slice(start, end + 1)) as T;
     }
-    throw new AiError(502, "We couldn't complete the analysis. Please try again.", "Unparseable AI response");
+    throw new AiError(
+      502,
+      "We couldn't complete the analysis. Please try again.",
+      "Unparseable AI response",
+    );
   }
 }

@@ -54,7 +54,9 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container-page flex h-16 items-center justify-between">
-          <span className="font-display text-lg font-semibold tracking-tight text-foreground">JobePilotAI</span>
+          <span className="font-display text-lg font-semibold tracking-tight text-foreground">
+            JobePilotAI
+          </span>
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost">
               <Link to="/auth" search={{}}>
@@ -80,8 +82,9 @@ export default function Landing() {
               Find Better Jobs. Apply Smarter.
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base opacity-80 sm:text-lg">
-              JobePilotAI reads your real resume, scores it against the role you want, finds live openings from public
-              job sources, and writes applications grounded in your actual experience.
+              JobePilotAI reads your real resume, scores it against the role you want, finds live
+              openings from public job sources, and writes applications grounded in your actual
+              experience.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg">
@@ -99,7 +102,9 @@ export default function Landing() {
         </section>
 
         <section className="container-page py-16 sm:py-24">
-          <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">How it works</h2>
+          <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+            How it works
+          </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Four steps, all backed by real data — your file, your preferences and live listings.
           </p>
@@ -110,7 +115,9 @@ export default function Landing() {
                 <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Step {index + 1}
                 </p>
-                <h3 className="mt-1 font-display text-base font-semibold text-foreground">{step.title}</h3>
+                <h3 className="mt-1 font-display text-base font-semibold text-foreground">
+                  {step.title}
+                </h3>
                 <p className="mt-2 text-sm text-muted-foreground">{step.body}</p>
               </li>
             ))}
@@ -123,8 +130,9 @@ export default function Landing() {
               Where the jobs come from
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              We only use public job APIs, feeds and company career boards that permit programmatic access. We never
-              scrape sites that prohibit it, and every listing links back to the original posting.
+              We only use public job APIs, feeds and company career boards that permit programmatic
+              access. We never scrape sites that prohibit it, and every listing links back to the
+              original posting.
             </p>
             <ul className="mt-6 flex flex-wrap gap-2">
               {sources.map((source) => (
@@ -141,24 +149,24 @@ export default function Landing() {
             <ListChecks className="size-5 text-primary" aria-hidden="true" />
             <h3 className="mt-4 font-display text-base font-semibold">Transparent match scores</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Every score shows its breakdown, the reasons behind it and the gaps you'd need to close. It's a fit
-              indicator, not a hiring prediction.
+              Every score shows its breakdown, the reasons behind it and the gaps you'd need to
+              close. It's a fit indicator, not a hiring prediction.
             </p>
           </div>
           <div className="surface-panel p-5">
             <ShieldCheck className="size-5 text-primary" aria-hidden="true" />
             <h3 className="mt-4 font-display text-base font-semibold">Your data stays yours</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Resumes are stored privately and readable only by your account. You can delete everything at any time
-              from settings.
+              Resumes are stored privately and readable only by your account. You can delete
+              everything at any time from settings.
             </p>
           </div>
           <div className="surface-panel p-5">
             <PenLine className="size-5 text-primary" aria-hidden="true" />
             <h3 className="mt-4 font-display text-base font-semibold">Nothing invented</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Generated documents use only what's in your resume. No fabricated employers, dates, metrics or
-              certifications.
+              Generated documents use only what's in your resume. No fabricated employers, dates,
+              metrics or certifications.
             </p>
           </div>
         </section>

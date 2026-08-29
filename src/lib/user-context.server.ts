@@ -29,12 +29,18 @@ export type ActiveResume = {
   created_at: string;
 };
 
-export async function loadProfile(supabase: SupabaseClient, userId: string): Promise<ProfileRow | null> {
+export async function loadProfile(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ProfileRow | null> {
   const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
   return (data as ProfileRow | null) ?? null;
 }
 
-export async function loadActiveResume(supabase: SupabaseClient, userId: string): Promise<ActiveResume | null> {
+export async function loadActiveResume(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ActiveResume | null> {
   const { data } = await supabase
     .from("resumes")
     .select("id, raw_text, parsed, status, original_filename, created_at")
@@ -46,7 +52,10 @@ export async function loadActiveResume(supabase: SupabaseClient, userId: string)
   return (data as ActiveResume | null) ?? null;
 }
 
-export function buildMatchProfile(profile: ProfileRow | null, resume: ActiveResume | null): MatchProfile {
+export function buildMatchProfile(
+  profile: ProfileRow | null,
+  resume: ActiveResume | null,
+): MatchProfile {
   const parsed = resume?.parsed ?? null;
   const resumeSkills = parsed?.skills ?? [];
   return {

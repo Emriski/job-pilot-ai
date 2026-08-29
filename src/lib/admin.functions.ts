@@ -14,7 +14,11 @@ export const getSourceDashboard = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const [{ data: sources }, { data: runs }] = await Promise.all([
       context.supabase.from("job_sources").select("*").order("name"),
-      context.supabase.from("job_source_runs").select("*").order("started_at", { ascending: false }).limit(30),
+      context.supabase
+        .from("job_source_runs")
+        .select("*")
+        .order("started_at", { ascending: false })
+        .limit(30),
     ]);
     return { sources: sources ?? [], runs: runs ?? [] };
   });
@@ -40,7 +44,9 @@ export const updateSource = createServerFn({ method: "POST" })
 
 export const runSourceSync = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { slug?: string }) => ({ slug: typeof data?.slug === "string" ? data.slug.slice(0, 40) : undefined }))
+  .inputValidator((data: { slug?: string }) => ({
+    slug: typeof data?.slug === "string" ? data.slug.slice(0, 40) : undefined,
+  }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { syncAllSources } = await import("./jobs-sync.server");

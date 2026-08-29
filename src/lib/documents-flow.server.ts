@@ -14,7 +14,8 @@ async function requireContext(supabase: SupabaseClient<Database>, userId: string
     getJobRow(jobId, supabase),
   ]);
   if (!job) throw new Error("We couldn't find that job. It may no longer be listed.");
-  if (!resume?.raw_text) throw new Error("Upload your resume first so we can tailor this to your experience.");
+  if (!resume?.raw_text)
+    throw new Error("Upload your resume first so we can tailor this to your experience.");
   return { profile, resume, job };
 }
 
@@ -67,7 +68,11 @@ export async function buildDocument(
   return data;
 }
 
-export async function buildPrepPack(supabase: SupabaseClient<Database>, userId: string, jobId: string) {
+export async function buildPrepPack(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  jobId: string,
+) {
   await enforceRateLimit(supabase, userId, "application_prep");
   const { profile, resume, job } = await requireContext(supabase, userId, jobId);
 

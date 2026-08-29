@@ -15,7 +15,12 @@ import { SOURCE_LABELS } from "@/lib/jobs/types";
 import { formatLocation, formatPosted, formatSalary, titleCase } from "@/lib/formatters";
 import { matchLabel } from "@/lib/matching";
 import { getJobMatch, saveJob, unsaveJob, listSavedJobs } from "@/lib/jobs.functions";
-import { generateDocument, getJobDocuments, prepareApplication, updateDocument } from "@/lib/documents.functions";
+import {
+  generateDocument,
+  getJobDocuments,
+  prepareApplication,
+  updateDocument,
+} from "@/lib/documents.functions";
 import { createApplication } from "@/lib/applications.functions";
 import { getMyContext } from "@/lib/profile.functions";
 import { safeExternalUrl } from "@/lib/security";
@@ -26,9 +31,16 @@ export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
   head: () => ({
     meta: [
       { title: "Job details — JobePilotAI" },
-      { name: "description", content: "See why this role fits your resume, prepare your application and apply at the source." },
+      {
+        name: "description",
+        content:
+          "See why this role fits your resume, prepare your application and apply at the source.",
+      },
       { property: "og:title", content: "Job details — JobePilotAI" },
-      { property: "og:description", content: "Match breakdown and application preparation for this role." },
+      {
+        property: "og:description",
+        content: "Match breakdown and application preparation for this role.",
+      },
     ],
   }),
   component: JobDetailPage,
@@ -51,11 +63,19 @@ function JobDetailPage() {
   const addApplication = useServerFn(createApplication);
 
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
-  const matchQuery = useQuery({ queryKey: ["job", jobId], queryFn: () => loadMatch({ data: { jobId } }) });
-  const docsQuery = useQuery({ queryKey: ["job-docs", jobId], queryFn: () => loadDocs({ data: { jobId } }) });
+  const matchQuery = useQuery({
+    queryKey: ["job", jobId],
+    queryFn: () => loadMatch({ data: { jobId } }),
+  });
+  const docsQuery = useQuery({
+    queryKey: ["job-docs", jobId],
+    queryFn: () => loadDocs({ data: { jobId } }),
+  });
   const savedQuery = useQuery({ queryKey: ["saved-jobs"], queryFn: () => loadSaved() });
 
-  const isSaved = (savedQuery.data ?? []).some((item) => (item.job as { id: string } | null)?.id === jobId);
+  const isSaved = (savedQuery.data ?? []).some(
+    (item) => (item.job as { id: string } | null)?.id === jobId,
+  );
   const [draft, setDraft] = useState<{ id: string; content: string } | null>(null);
 
   const prepMutation = useMutation({
@@ -64,7 +84,8 @@ function JobDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ["job-docs", jobId] });
       toast.success("Application plan ready.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't complete the analysis. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't complete the analysis. Please try again."),
   });
 
   useEffect(() => {
@@ -75,13 +96,15 @@ function JobDetailPage() {
   }, [prepare, matchQuery.data?.hasResume]);
 
   const docMutation = useMutation({
-    mutationFn: (docType: "cover_letter" | "tailored_resume") => generate({ data: { jobId, docType } }),
+    mutationFn: (docType: "cover_letter" | "tailored_resume") =>
+      generate({ data: { jobId, docType } }),
     onSuccess: async (doc) => {
       await queryClient.invalidateQueries({ queryKey: ["job-docs", jobId] });
       setDraft({ id: doc.id, content: doc.content ?? "" });
       toast.success("Document generated.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't complete the analysis. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't complete the analysis. Please try again."),
   });
 
   const saveDocMutation = useMutation({
@@ -110,7 +133,8 @@ function JobDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
       toast.success("Added to your application tracker.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't add that application. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't add that application. Please try again."),
   });
 
   if (matchQuery.isLoading) {
@@ -165,8 +189,12 @@ function JobDetailPage() {
 
             <div className="mt-4 flex flex-wrap gap-1.5">
               <Badge variant="outline">{formatLocation(job)}</Badge>
-              {job.employment_type ? <Badge variant="outline">{titleCase(job.employment_type)}</Badge> : null}
-              {job.experience_level ? <Badge variant="outline">{titleCase(job.experience_level)}</Badge> : null}
+              {job.employment_type ? (
+                <Badge variant="outline">{titleCase(job.employment_type)}</Badge>
+              ) : null}
+              {job.experience_level ? (
+                <Badge variant="outline">{titleCase(job.experience_level)}</Badge>
+              ) : null}
               <Badge variant="secondary">{formatSalary(job)}</Badge>
               <Badge variant="secondary">Posted {formatPosted(job.posted_at).toLowerCase()}</Badge>
               <Badge variant="outline">Source: {SOURCE_LABELS[job.source] ?? job.source}</Badge>
@@ -183,19 +211,34 @@ function JobDetailPage() {
               ) : (
                 <Button disabled>Application link unavailable</Button>
               )}
-              <Button variant="outline" onClick={() => prepMutation.mutate()} disabled={prepMutation.isPending || !hasResume}>
-                {prepMutation.isPending ? "Preparing your application..." : "Prepare my application"}
+              <Button
+                variant="outline"
+                onClick={() => prepMutation.mutate()}
+                disabled={prepMutation.isPending || !hasResume}
+              >
+                {prepMutation.isPending
+                  ? "Preparing your application..."
+                  : "Prepare my application"}
               </Button>
               <Button
                 variant="outline"
                 onClick={() =>
-                  isSaved ? unsave({ data: { jobId } }).then(() => queryClient.invalidateQueries({ queryKey: ["saved-jobs"] }))
-                    : save({ data: { jobId, notes: null } }).then(() => queryClient.invalidateQueries({ queryKey: ["saved-jobs"] }))
+                  isSaved
+                    ? unsave({ data: { jobId } }).then(() =>
+                        queryClient.invalidateQueries({ queryKey: ["saved-jobs"] }),
+                      )
+                    : save({ data: { jobId, notes: null } }).then(() =>
+                        queryClient.invalidateQueries({ queryKey: ["saved-jobs"] }),
+                      )
                 }
               >
                 {isSaved ? "Saved" : "Save job"}
               </Button>
-              <Button variant="ghost" onClick={() => trackMutation.mutate()} disabled={trackMutation.isPending}>
+              <Button
+                variant="ghost"
+                onClick={() => trackMutation.mutate()}
+                disabled={trackMutation.isPending}
+              >
                 Track this application
               </Button>
             </div>
@@ -218,8 +261,8 @@ function JobDetailPage() {
                 <span className="font-display text-2xl font-semibold">{match.score}%</span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
-                {band.label} match. This compares your resume and preferences with this listing. It is not a prediction
-                of whether you'll be hired.
+                {band.label} match. This compares your resume and preferences with this listing. It
+                is not a prediction of whether you'll be hired.
               </p>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -306,7 +349,9 @@ function JobDetailPage() {
 
           <section className="surface-panel p-5">
             <h2 className="font-display text-base font-semibold">Job description</h2>
-            <div className="prose-plain mt-3 text-sm text-foreground">{job.description || "No description provided by the source."}</div>
+            <div className="prose-plain mt-3 text-sm text-foreground">
+              {job.description || "No description provided by the source."}
+            </div>
             {job.requirements ? (
               <>
                 <h3 className="mt-5 text-sm font-semibold">Requirements</h3>
@@ -316,7 +361,12 @@ function JobDetailPage() {
             {applyUrl ? (
               <p className="mt-5 text-xs text-muted-foreground">
                 Listing provided by {SOURCE_LABELS[job.source] ?? job.source}.{" "}
-                <a href={applyUrl} target="_blank" rel="noopener noreferrer nofollow" className="underline">
+                <a
+                  href={applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="underline"
+                >
                   View the original listing
                 </a>
                 .
@@ -352,9 +402,15 @@ function JobDetailPage() {
                 {documents.map((doc) => (
                   <li key={doc.id} className="rounded-md border border-border p-3">
                     <p className="text-sm font-medium text-foreground">{doc.title}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(doc.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(doc.created_at).toLocaleString()}
+                    </p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <Button size="sm" variant="ghost" onClick={() => setDraft({ id: doc.id, content: doc.content ?? "" })}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDraft({ id: doc.id, content: doc.content ?? "" })}
+                      >
                         Open
                       </Button>
                       <Button
@@ -395,7 +451,11 @@ function JobDetailPage() {
                 aria-label="Document content"
               />
               <div className="mt-3 flex gap-2">
-                <Button size="sm" onClick={() => saveDocMutation.mutate(draft)} disabled={saveDocMutation.isPending}>
+                <Button
+                  size="sm"
+                  onClick={() => saveDocMutation.mutate(draft)}
+                  disabled={saveDocMutation.isPending}
+                >
                   Save changes
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setDraft(null)}>

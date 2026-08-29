@@ -18,7 +18,9 @@ const NAV = [
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <span className={cn("font-display text-lg font-semibold tracking-tight text-foreground", className)}>
+    <span
+      className={cn("font-display text-lg font-semibold tracking-tight text-foreground", className)}
+    >
       Jobe<span className="text-primary">Pilot</span>AI
     </span>
   );
@@ -74,7 +76,11 @@ export function AppShell({ children, isAdmin }: { children: ReactNode; isAdmin?:
               aria-label={open ? "Close menu" : "Open menu"}
               onClick={() => setOpen((value) => !value)}
             >
-              {open ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
+              {open ? (
+                <X className="size-5" aria-hidden="true" />
+              ) : (
+                <Menu className="size-5" aria-hidden="true" />
+              )}
             </Button>
           </div>
         </div>
@@ -117,8 +123,12 @@ export function PageHeading({
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h1>
-        {description ? <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          {title}
+        </h1>
+        {description ? (
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+        ) : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </div>

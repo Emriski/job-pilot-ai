@@ -54,10 +54,66 @@ export type MatchResult = {
 };
 
 const STOP_WORDS = new Set([
-  "the","and","for","with","you","your","our","are","that","this","will","have","has","from","not","all","can",
-  "who","what","their","them","they","its","was","were","been","but","any","out","use","how","into","also",
-  "job","role","work","team","company","position","experience","years","year","new","more","other","must",
-  "about","across","within","using","strong","good","great","plus","etc","per","via","able","help","make",
+  "the",
+  "and",
+  "for",
+  "with",
+  "you",
+  "your",
+  "our",
+  "are",
+  "that",
+  "this",
+  "will",
+  "have",
+  "has",
+  "from",
+  "not",
+  "all",
+  "can",
+  "who",
+  "what",
+  "their",
+  "them",
+  "they",
+  "its",
+  "was",
+  "were",
+  "been",
+  "but",
+  "any",
+  "out",
+  "use",
+  "how",
+  "into",
+  "also",
+  "job",
+  "role",
+  "work",
+  "team",
+  "company",
+  "position",
+  "experience",
+  "years",
+  "year",
+  "new",
+  "more",
+  "other",
+  "must",
+  "about",
+  "across",
+  "within",
+  "using",
+  "strong",
+  "good",
+  "great",
+  "plus",
+  "etc",
+  "per",
+  "via",
+  "able",
+  "help",
+  "make",
 ]);
 
 function tokens(text: string): string[] {
@@ -69,7 +125,11 @@ function tokens(text: string): string[] {
 }
 
 function normalise(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9+#. ]+/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9+#. ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Token-overlap similarity between two role titles (0–1). */
@@ -115,7 +175,10 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
 
   /* Role similarity ------------------------------------------------ */
   const candidateTitles = [...profile.targetTitles, ...profile.resumeTitles].filter(Boolean);
-  const roleSimilarity = candidateTitles.reduce((best, title) => Math.max(best, titleSimilarity(title, job.title)), 0);
+  const roleSimilarity = candidateTitles.reduce(
+    (best, title) => Math.max(best, titleSimilarity(title, job.title)),
+    0,
+  );
   const role = Math.round(roleSimilarity * 100);
   if (role >= 55) reasons.push(`Job title closely matches your target role (${job.title}).`);
   else if (role >= 30) reasons.push("Job title partially overlaps with your target role.");
@@ -128,19 +191,22 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
   const missingSkills: string[] = [];
 
   for (const skill of jobSkills) {
-    const inResume = profileSkills.includes(skill) || profile.resumeText.toLowerCase().includes(skill);
+    const inResume =
+      profileSkills.includes(skill) || profile.resumeText.toLowerCase().includes(skill);
     if (inResume) matchedSkills.push(skill);
     else missingSkills.push(skill);
   }
   // Also credit profile skills explicitly named in the job description.
   for (const skill of profileSkills) {
-    if (!matchedSkills.includes(skill) && jobText.toLowerCase().includes(skill)) matchedSkills.push(skill);
+    if (!matchedSkills.includes(skill) && jobText.toLowerCase().includes(skill))
+      matchedSkills.push(skill);
   }
 
   const skillDenominator = Math.max(jobSkills.length, Math.min(profileSkills.length, 8), 1);
   const skills = Math.round(Math.min(1, matchedSkills.length / skillDenominator) * 100);
   if (matchedSkills.length) reasons.push(`Shared skills: ${matchedSkills.slice(0, 6).join(", ")}.`);
-  if (missingSkills.length) gaps.push(`Not found in your resume: ${missingSkills.slice(0, 5).join(", ")}.`);
+  if (missingSkills.length)
+    gaps.push(`Not found in your resume: ${missingSkills.slice(0, 5).join(", ")}.`);
 
   /* Experience ----------------------------------------------------- */
   const userLevel = levelIndex(profile.experienceLevel);
@@ -150,13 +216,16 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
     const distance = Math.abs(userLevel - jobLevel);
     experience = distance === 0 ? 100 : distance === 1 ? 75 : distance === 2 ? 45 : 20;
     if (distance === 0) reasons.push(`Seniority matches your ${profile.experienceLevel} level.`);
-    else if (userLevel < jobLevel) gaps.push(`This role targets a ${job.experience_level} level, above your stated level.`);
+    else if (userLevel < jobLevel)
+      gaps.push(`This role targets a ${job.experience_level} level, above your stated level.`);
   }
 
   /* Keyword coverage ----------------------------------------------- */
   let sharedKeywords = 0;
   for (const token of jobTokens) if (resumeTokens.has(token)) sharedKeywords += 1;
-  const keywords = jobTokens.size ? Math.round(Math.min(1, sharedKeywords / Math.min(jobTokens.size, 80)) * 100) : 0;
+  const keywords = jobTokens.size
+    ? Math.round(Math.min(1, sharedKeywords / Math.min(jobTokens.size, 80)) * 100)
+    : 0;
 
   /* Location / remote ---------------------------------------------- */
   let location = 60;
@@ -171,7 +240,9 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
     if (wantsRemote) gaps.push("This role is not listed as remote.");
   }
   if (profile.countries.length && job.country) {
-    const countryMatch = profile.countries.some((country) => normalise(job.country ?? "").includes(normalise(country)));
+    const countryMatch = profile.countries.some((country) =>
+      normalise(job.country ?? "").includes(normalise(country)),
+    );
     if (countryMatch) {
       location = Math.min(100, location + 10);
       reasons.push(`Location includes ${job.country}, one of your preferred countries.`);
@@ -200,16 +271,25 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
   /* Employment type ------------------------------------------------ */
   let employment = 70;
   if (profile.employmentTypes.length && job.employment_type) {
-    const matchesType = profile.employmentTypes.some((type) => normalise(job.employment_type ?? "").includes(normalise(type)));
+    const matchesType = profile.employmentTypes.some((type) =>
+      normalise(job.employment_type ?? "").includes(normalise(type)),
+    );
     employment = matchesType ? 100 : 40;
-    if (matchesType) reasons.push(`Employment type matches your preference (${job.employment_type}).`);
+    if (matchesType)
+      reasons.push(`Employment type matches your preference (${job.employment_type}).`);
     else gaps.push(`Employment type is ${job.employment_type}, which isn't in your preferences.`);
   }
 
   const breakdown = { role, skills, experience, keywords, location, salary, employment };
 
   const score = Math.round(
-    role * 0.3 + skills * 0.22 + experience * 0.12 + keywords * 0.12 + location * 0.12 + salary * 0.06 + employment * 0.06,
+    role * 0.3 +
+      skills * 0.22 +
+      experience * 0.12 +
+      keywords * 0.12 +
+      location * 0.12 +
+      salary * 0.06 +
+      employment * 0.06,
   );
 
   return {
@@ -222,7 +302,10 @@ export function computeMatch(profile: MatchProfile, job: MatchJob): MatchResult 
   };
 }
 
-export function matchLabel(score: number): { label: string; tone: "strong" | "good" | "fair" | "weak" } {
+export function matchLabel(score: number): {
+  label: string;
+  tone: "strong" | "good" | "fair" | "weak";
+} {
   if (score >= 80) return { label: "Strong match", tone: "strong" };
   if (score >= 65) return { label: "Good match", tone: "good" };
   if (score >= 45) return { label: "Fair match", tone: "fair" };

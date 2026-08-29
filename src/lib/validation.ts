@@ -8,14 +8,36 @@ const stringArray = (maxItems: number, maxLength: number) =>
   z.array(z.string().trim().min(1).max(maxLength)).max(maxItems).default([]);
 
 export const WORK_MODES = ["remote", "hybrid", "onsite"] as const;
-export const EMPLOYMENT_TYPES = ["full-time", "part-time", "contract", "temporary", "internship"] as const;
+export const EMPLOYMENT_TYPES = [
+  "full-time",
+  "part-time",
+  "contract",
+  "temporary",
+  "internship",
+] as const;
 export const EXPERIENCE_LEVELS = ["entry", "junior", "mid", "senior", "lead"] as const;
 export const SALARY_PERIODS = ["hourly", "daily", "weekly", "monthly", "yearly"] as const;
-export const CURRENCIES = ["USD", "EUR", "GBP", "NGN", "CAD", "AUD", "INR", "ZAR", "KES", "GHS", "PHP", "BRL"] as const;
+export const CURRENCIES = [
+  "USD",
+  "EUR",
+  "GBP",
+  "NGN",
+  "CAD",
+  "AUD",
+  "INR",
+  "ZAR",
+  "KES",
+  "GHS",
+  "PHP",
+  "BRL",
+] as const;
 
 export const profileInputSchema = z.object({
   full_name: shortText(120).min(1, "Please enter your name"),
-  target_titles: stringArray(8, 120).refine((value) => value.length > 0, "Add at least one target job title"),
+  target_titles: stringArray(8, 120).refine(
+    (value) => value.length > 0,
+    "Add at least one target job title",
+  ),
   employment_types: z.array(z.enum(EMPLOYMENT_TYPES)).max(5).default([]),
   work_modes: z.array(z.enum(WORK_MODES)).max(3).default([]),
   countries: stringArray(10, 80),
@@ -50,7 +72,9 @@ export const jobSearchSchema = z.object({
   experienceLevels: z.array(z.enum(EXPERIENCE_LEVELS)).max(5).default([]),
   minSalary: z.number().min(0).max(100_000_000).nullable().default(null),
   salaryPeriod: z.enum(SALARY_PERIODS).default("monthly"),
-  postedWithinDays: z.union([z.literal(1), z.literal(3), z.literal(7), z.literal(14), z.literal(30), z.literal(0)]).default(0),
+  postedWithinDays: z
+    .union([z.literal(1), z.literal(3), z.literal(7), z.literal(14), z.literal(30), z.literal(0)])
+    .default(0),
   sources: z.array(z.string().trim().max(40)).max(12).default([]),
   page: z.number().int().min(1).max(100).default(1),
   pageSize: z.number().int().min(6).max(48).default(12),
@@ -62,7 +86,11 @@ export const processResumeSchema = z.object({
   filePath: z.string().trim().min(8).max(300),
   originalFilename: shortText(200),
   mimeType: shortText(120),
-  sizeBytes: z.number().int().min(1).max(8 * 1024 * 1024),
+  sizeBytes: z
+    .number()
+    .int()
+    .min(1)
+    .max(8 * 1024 * 1024),
 });
 
 export const reanalyseSchema = z.object({
@@ -91,7 +119,16 @@ export const applicationInputSchema = z.object({
   job_title: shortText(200).min(1),
   application_url: z.string().trim().max(2048).nullable().default(null),
   status: z
-    .enum(["saved", "preparing", "applied", "interview", "assessment", "offer", "rejected", "withdrawn"])
+    .enum([
+      "saved",
+      "preparing",
+      "applied",
+      "interview",
+      "assessment",
+      "offer",
+      "rejected",
+      "withdrawn",
+    ])
     .default("saved"),
   notes: z.string().trim().max(4000).nullable().default(null),
   next_action: shortText(300).nullable().default(null),
@@ -104,7 +141,10 @@ export const applicationInputSchema = z.object({
 
 export const applicationUpdateSchema = applicationInputSchema.partial().extend({ id: z.uuid() });
 
-export const savedJobSchema = z.object({ jobId: z.uuid(), notes: z.string().trim().max(2000).nullable().default(null) });
+export const savedJobSchema = z.object({
+  jobId: z.uuid(),
+  notes: z.string().trim().max(2000).nullable().default(null),
+});
 
 export const sourceUpdateSchema = z.object({
   slug: z.string().trim().min(2).max(40),

@@ -14,11 +14,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { exampleRole } from "@/lib/professions";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { titleCase } from "@/lib/formatters";
 import { getMyContext } from "@/lib/profile.functions";
-import { getRecommendations, listSavedJobs, saveJob, searchJobs, unsaveJob } from "@/lib/jobs.functions";
+import {
+  getRecommendations,
+  listSavedJobs,
+  saveJob,
+  searchJobs,
+  unsaveJob,
+} from "@/lib/jobs.functions";
 import {
   EMPLOYMENT_TYPES,
   EXPERIENCE_LEVELS,
@@ -31,7 +43,11 @@ export const Route = createFileRoute("/_authenticated/jobs/")({
   head: () => ({
     meta: [
       { title: "Find jobs — JobePilotAI" },
-      { name: "description", content: "Search live listings from public job sources and see how well each one matches your resume." },
+      {
+        name: "description",
+        content:
+          "Search live listings from public job sources and see how well each one matches your resume.",
+      },
       { property: "og:title", content: "Find jobs — JobePilotAI" },
       { property: "og:description", content: "Real listings, scored against your resume." },
     ],
@@ -69,7 +85,9 @@ function JobsPage() {
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
   const savedQuery = useQuery({ queryKey: ["saved-jobs"], queryFn: () => loadSaved() });
   const savedIds = new Set(
-    (savedQuery.data ?? []).map((item) => (item.job as { id: string } | null)?.id).filter(Boolean) as string[],
+    (savedQuery.data ?? [])
+      .map((item) => (item.job as { id: string } | null)?.id)
+      .filter(Boolean) as string[],
   );
 
   const searchQuery = useQuery({
@@ -90,7 +108,8 @@ function JobsPage() {
       await queryClient.invalidateQueries({ queryKey: ["recommendations"] });
       toast.success("Job sources refreshed.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't retrieve jobs right now. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't retrieve jobs right now. Please try again."),
   });
 
   const saveMutation = useMutation({
@@ -121,7 +140,10 @@ function JobsPage() {
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending}
           >
-            <RefreshCw className={refreshMutation.isPending ? "size-4 animate-spin" : "size-4"} aria-hidden="true" />
+            <RefreshCw
+              className={refreshMutation.isPending ? "size-4 animate-spin" : "size-4"}
+              aria-hidden="true"
+            />
             {refreshMutation.isPending ? "Refreshing sources..." : "Refresh sources"}
           </Button>
         }
@@ -155,8 +177,8 @@ function JobsPage() {
           ) : (
             <>
               <p className="mb-4 text-sm text-muted-foreground" role="status">
-                Scanned {recommendQuery.data.scanned} active listings · {recommendQuery.data.strong} strong matches
-                found.
+                Scanned {recommendQuery.data.scanned} active listings · {recommendQuery.data.strong}{" "}
+                strong matches found.
               </p>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {recommendations.map(({ job, match }) => (
@@ -165,7 +187,9 @@ function JobsPage() {
                     job={job}
                     score={match.score}
                     saved={savedIds.has(job.id)}
-                    onToggleSave={() => saveMutation.mutate({ jobId: job.id, isSaved: savedIds.has(job.id) })}
+                    onToggleSave={() =>
+                      saveMutation.mutate({ jobId: job.id, isSaved: savedIds.has(job.id) })
+                    }
                   />
                 ))}
               </div>
@@ -205,7 +229,9 @@ function JobsPage() {
                 <Label htmlFor="mode">Work setup</Label>
                 <Select
                   value={filters.workMode}
-                  onValueChange={(value) => setFilters({ ...filters, workMode: value as JobSearchInput["workMode"] })}
+                  onValueChange={(value) =>
+                    setFilters({ ...filters, workMode: value as JobSearchInput["workMode"] })
+                  }
                 >
                   <SelectTrigger id="mode">
                     <SelectValue />
@@ -231,7 +257,10 @@ function JobsPage() {
                   min={0}
                   value={filters.minSalary ?? ""}
                   onChange={(event) =>
-                    setFilters({ ...filters, minSalary: event.target.value === "" ? null : Number(event.target.value) })
+                    setFilters({
+                      ...filters,
+                      minSalary: event.target.value === "" ? null : Number(event.target.value),
+                    })
                   }
                 />
               </div>
@@ -240,7 +269,10 @@ function JobsPage() {
                 <Select
                   value={filters.salaryPeriod}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, salaryPeriod: value as JobSearchInput["salaryPeriod"] })
+                    setFilters({
+                      ...filters,
+                      salaryPeriod: value as JobSearchInput["salaryPeriod"],
+                    })
                   }
                 >
                   <SelectTrigger id="period">
@@ -260,7 +292,10 @@ function JobsPage() {
                 <Select
                   value={String(filters.postedWithinDays)}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, postedWithinDays: Number(value) as JobSearchInput["postedWithinDays"] })
+                    setFilters({
+                      ...filters,
+                      postedWithinDays: Number(value) as JobSearchInput["postedWithinDays"],
+                    })
                   }
                 >
                   <SelectTrigger id="posted">
@@ -341,10 +376,14 @@ function JobsPage() {
             />
           ) : (
             <>
-              <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground" role="status">
+              <div
+                className="mb-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+                role="status"
+              >
                 <Badge variant="secondary">Found {searchQuery.data!.total} jobs</Badge>
                 <span>
-                  Page {applied.page} of {Math.max(1, Math.ceil(searchQuery.data!.total / applied.pageSize))}
+                  Page {applied.page} of{" "}
+                  {Math.max(1, Math.ceil(searchQuery.data!.total / applied.pageSize))}
                 </span>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -353,7 +392,9 @@ function JobsPage() {
                     key={job.id}
                     job={job}
                     saved={savedIds.has(job.id)}
-                    onToggleSave={() => saveMutation.mutate({ jobId: job.id, isSaved: savedIds.has(job.id) })}
+                    onToggleSave={() =>
+                      saveMutation.mutate({ jobId: job.id, isSaved: savedIds.has(job.id) })
+                    }
                   />
                 ))}
               </div>

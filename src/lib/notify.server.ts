@@ -1,14 +1,7 @@
 import { cleanText, safeInternalPath } from "./security";
 
 type NotificationKind =
-  | "comment"
-  | "reply"
-  | "reaction"
-  | "follow"
-  | "mention"
-  | "moderation"
-  | "message"
-  | "job_alert";
+  "comment" | "reply" | "reaction" | "follow" | "mention" | "moderation" | "message" | "job_alert";
 
 const SETTING_FOR_KIND: Record<NotificationKind, string> = {
   comment: "comments",

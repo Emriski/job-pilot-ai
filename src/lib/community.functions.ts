@@ -19,13 +19,17 @@ import {
 const PAGE_SIZE = 20;
 
 /** Anything the caller has blocked or muted never reaches their feed. */
-async function hiddenUserIds(supabase: Parameters<typeof isAdmin>[0], userId: string): Promise<string[]> {
+async function hiddenUserIds(
+  supabase: Parameters<typeof isAdmin>[0],
+  userId: string,
+): Promise<string[]> {
   const [{ data: blocks }, { data: mutes }] = await Promise.all([
     supabase.from("user_blocks").select("blocked_user_id").eq("user_id", userId),
     supabase.from("user_mutes").select("muted_user_id").eq("user_id", userId),
   ]);
   const ids = new Set<string>();
-  for (const row of (blocks ?? []) as Array<{ blocked_user_id: string }>) ids.add(row.blocked_user_id);
+  for (const row of (blocks ?? []) as Array<{ blocked_user_id: string }>)
+    ids.add(row.blocked_user_id);
   for (const row of (mutes ?? []) as Array<{ muted_user_id: string }>) ids.add(row.muted_user_id);
   return [...ids];
 }
@@ -64,15 +68,15 @@ export type SharedJobSummary = {
 function toSharedJob(value: unknown): SharedJobSummary | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;
-  if (typeof v['id'] !== "string" || typeof v['title'] !== "string") return null;
+  if (typeof v["id"] !== "string" || typeof v["title"] !== "string") return null;
   return {
-    id: v['id'],
-    title: cleanText(v['title'], 160),
-    company_name: cleanText(v['company_name'], 160),
-    location: typeof v['location'] === "string" ? cleanText(v['location'], 160) : null,
-    remote: Boolean(v['remote']),
-    application_url: safeExternalUrl(v['application_url']),
-    source: typeof v['source'] === "string" ? cleanText(v['source'], 60) : null,
+    id: v["id"],
+    title: cleanText(v["title"], 160),
+    company_name: cleanText(v["company_name"], 160),
+    location: typeof v["location"] === "string" ? cleanText(v["location"], 160) : null,
+    remote: Boolean(v["remote"]),
+    application_url: safeExternalUrl(v["application_url"]),
+    source: typeof v["source"] === "string" ? cleanText(v["source"], 60) : null,
   };
 }
 
@@ -96,13 +100,22 @@ async function decoratePosts(
   userId: string,
   rows: PostRow[],
 ) {
-  const identities = await loadIdentities(supabase, rows.map((row) => row.user_id));
+  const identities = await loadIdentities(
+    supabase,
+    rows.map((row) => row.user_id),
+  );
   const ids = rows.map((row) => row.id);
   const { data: myReactions } = ids.length
-    ? await supabase.from("community_reactions").select("post_id").eq("user_id", userId).in("post_id", ids)
+    ? await supabase
+        .from("community_reactions")
+        .select("post_id")
+        .eq("user_id", userId)
+        .in("post_id", ids)
     : { data: [] };
   const reacted = new Set(
-    ((myReactions ?? []) as Array<{ post_id: string | null }>).map((row) => row.post_id).filter(Boolean) as string[],
+    ((myReactions ?? []) as Array<{ post_id: string | null }>)
+      .map((row) => row.post_id)
+      .filter(Boolean) as string[],
   );
 
   return rows.map((row) => ({
@@ -118,7 +131,12 @@ async function decoratePosts(
     reactionCount: row.reaction_count,
     createdAt: row.created_at,
     isMine: row.user_id === userId,
-    author: identities.get(row.user_id) ?? { id: row.user_id, nickname: null, avatarUrl: null, headline: null },
+    author: identities.get(row.user_id) ?? {
+      id: row.user_id,
+      nickname: null,
+      avatarUrl: null,
+      headline: null,
+    },
     hasReacted: reacted.has(row.id),
   }));
 }
@@ -167,7 +185,10 @@ export const getPost = createServerFn({ method: "POST" })
       )
       .eq("id", data.postId)
       .maybeSingle();
-    if (!row || ((row as { status: string }).status !== "published" && (row as PostRow).user_id !== userId)) {
+    if (
+      !row ||
+      ((row as { status: string }).status !== "published" && (row as PostRow).user_id !== userId)
+    ) {
       return null;
     }
 
@@ -188,7 +209,10 @@ export const getPost = createServerFn({ method: "POST" })
       body: string;
       created_at: string;
     }>;
-    const identities = await loadIdentities(supabase, comments.map((item) => item.user_id));
+    const identities = await loadIdentities(
+      supabase,
+      comments.map((item) => item.user_id),
+    );
 
     return {
       post: post!,
@@ -219,7 +243,11 @@ export const createPost = createServerFn({ method: "POST" })
     await enforceRateLimit(supabase, userId, "community_post");
 
     // Community members must have a public identity before they can post.
-    const { data: profile } = await supabase.from("profiles").select("nickname").eq("id", userId).maybeSingle();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nickname")
+      .eq("id", userId)
+      .maybeSingle();
     if (!(profile as { nickname: string | null } | null)?.nickname) {
       throw new Error("Choose a nickname on your profile before posting.");
     }
@@ -276,7 +304,11 @@ export const deletePost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("community_posts").delete().eq("id", data.id).eq("user_id", context.userId);
+    await context.supabase
+      .from("community_posts")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     return { ok: true };
   });
 
@@ -294,7 +326,8 @@ export const addComment = createServerFn({ method: "POST" })
       .eq("id", data.postId)
       .maybeSingle();
     const postRow = post as { id: string; user_id: string; title: string; status: string } | null;
-    if (!postRow || postRow.status !== "published") throw new Error("That post is no longer available.");
+    if (!postRow || postRow.status !== "published")
+      throw new Error("That post is no longer available.");
 
     let parentAuthor: string | null = null;
     if (data.parentId) {
@@ -304,7 +337,8 @@ export const addComment = createServerFn({ method: "POST" })
         .eq("id", data.parentId)
         .maybeSingle();
       const parentRow = parent as { user_id: string; post_id: string } | null;
-      if (!parentRow || parentRow.post_id !== data.postId) throw new Error("That comment is no longer available.");
+      if (!parentRow || parentRow.post_id !== data.postId)
+        throw new Error("That comment is no longer available.");
       parentAuthor = parentRow.user_id;
     }
 
@@ -349,7 +383,11 @@ export const deleteComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    await context.supabase.from("community_comments").delete().eq("id", data.id).eq("user_id", context.userId);
+    await context.supabase
+      .from("community_comments")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
     return { ok: true };
   });
 
@@ -366,7 +404,10 @@ export const toggleReaction = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (existing) {
-      await supabase.from("community_reactions").delete().eq("id", (existing as { id: string }).id);
+      await supabase
+        .from("community_reactions")
+        .delete()
+        .eq("id", (existing as { id: string }).id);
       return { reacted: false };
     }
 
@@ -402,7 +443,10 @@ export const followUser = createServerFn({ method: "POST" })
     if (data.userId === userId) throw new Error("You can't follow yourself.");
     const { error } = await supabase
       .from("user_follows")
-      .upsert({ follower_id: userId, following_id: data.userId }, { onConflict: "follower_id,following_id" });
+      .upsert(
+        { follower_id: userId, following_id: data.userId },
+        { onConflict: "follower_id,following_id" },
+      );
     if (error) throw new Error("We couldn't follow that person. Please try again.");
     await notify({
       userId: data.userId,
@@ -432,12 +476,22 @@ export const blockUser = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (data.userId === userId) throw new Error("You can't block yourself.");
-    await supabase.from("user_blocks").upsert(
-      { user_id: userId, blocked_user_id: data.userId },
-      { onConflict: "user_id,blocked_user_id" },
-    );
-    await supabase.from("user_follows").delete().eq("follower_id", userId).eq("following_id", data.userId);
-    await supabase.from("user_follows").delete().eq("follower_id", data.userId).eq("following_id", userId);
+    await supabase
+      .from("user_blocks")
+      .upsert(
+        { user_id: userId, blocked_user_id: data.userId },
+        { onConflict: "user_id,blocked_user_id" },
+      );
+    await supabase
+      .from("user_follows")
+      .delete()
+      .eq("follower_id", userId)
+      .eq("following_id", data.userId);
+    await supabase
+      .from("user_follows")
+      .delete()
+      .eq("follower_id", data.userId)
+      .eq("following_id", userId);
     return { ok: true };
   });
 
@@ -460,7 +514,10 @@ export const muteUser = createServerFn({ method: "POST" })
     if (data.userId === context.userId) throw new Error("You can't mute yourself.");
     await context.supabase
       .from("user_mutes")
-      .upsert({ user_id: context.userId, muted_user_id: data.userId }, { onConflict: "user_id,muted_user_id" });
+      .upsert(
+        { user_id: context.userId, muted_user_id: data.userId },
+        { onConflict: "user_id,muted_user_id" },
+      );
     return { ok: true };
   });
 
@@ -484,7 +541,9 @@ export const listBlockedAndMuted = createServerFn({ method: "GET" })
       supabase.from("user_blocks").select("blocked_user_id").eq("user_id", userId),
       supabase.from("user_mutes").select("muted_user_id").eq("user_id", userId),
     ]);
-    const blockIds = ((blocks ?? []) as Array<{ blocked_user_id: string }>).map((r) => r.blocked_user_id);
+    const blockIds = ((blocks ?? []) as Array<{ blocked_user_id: string }>).map(
+      (r) => r.blocked_user_id,
+    );
     const muteIds = ((mutes ?? []) as Array<{ muted_user_id: string }>).map((r) => r.muted_user_id);
     const identities = await loadIdentities(supabase, [...blockIds, ...muteIds]);
     return {
@@ -535,7 +594,13 @@ export const moderateContent = createServerFn({ method: "POST" })
     z
       .object({
         reportId: z.uuid().nullable().default(null),
-        action: z.enum(["remove_post", "remove_comment", "restrict_user", "lift_restriction", "dismiss"]),
+        action: z.enum([
+          "remove_post",
+          "remove_comment",
+          "restrict_user",
+          "lift_restriction",
+          "dismiss",
+        ]),
         targetId: z.uuid(),
         notes: z.string().trim().max(500).nullable().default(null),
       })
@@ -547,7 +612,10 @@ export const moderateContent = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     if (data.action === "remove_post") {
-      await supabaseAdmin.from("community_posts").update({ status: "removed" }).eq("id", data.targetId);
+      await supabaseAdmin
+        .from("community_posts")
+        .update({ status: "removed" })
+        .eq("id", data.targetId);
       const { data: post } = await supabaseAdmin
         .from("community_posts")
         .select("user_id, title")
@@ -562,7 +630,10 @@ export const moderateContent = createServerFn({ method: "POST" })
         });
       }
     } else if (data.action === "remove_comment") {
-      await supabaseAdmin.from("community_comments").update({ status: "removed" }).eq("id", data.targetId);
+      await supabaseAdmin
+        .from("community_comments")
+        .update({ status: "removed" })
+        .eq("id", data.targetId);
     } else if (data.action === "restrict_user") {
       await supabaseAdmin.from("user_restrictions").insert({
         user_id: data.targetId,
@@ -583,7 +654,11 @@ export const moderateContent = createServerFn({ method: "POST" })
     await supabaseAdmin.from("moderation_actions").insert({
       moderator_id: userId,
       action: data.action,
-      target_type: data.action.includes("comment") ? "comment" : data.action.includes("post") ? "post" : "user",
+      target_type: data.action.includes("comment")
+        ? "comment"
+        : data.action.includes("post")
+          ? "post"
+          : "user",
       target_id: data.targetId,
       notes: data.notes,
     });

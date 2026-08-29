@@ -62,6 +62,8 @@ export async function enforceRateLimit(
     );
   }
 
-  const { error: insertError } = await supabase.from("rate_limits").insert({ user_id: userId, action });
+  const { error: insertError } = await supabase
+    .from("rate_limits")
+    .insert({ user_id: userId, action });
   if (insertError) console.error("[rate-limit] write failed", insertError.message);
 }

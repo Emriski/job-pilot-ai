@@ -10,10 +10,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { APPLICATION_STATUSES, titleCase } from "@/lib/formatters";
-import { createApplication, deleteApplication, listApplications, updateApplication } from "@/lib/applications.functions";
+import {
+  createApplication,
+  deleteApplication,
+  listApplications,
+  updateApplication,
+} from "@/lib/applications.functions";
 import { getMyContext } from "@/lib/profile.functions";
 import { safeExternalUrl } from "@/lib/security";
 
@@ -21,9 +32,15 @@ export const Route = createFileRoute("/_authenticated/applications")({
   head: () => ({
     meta: [
       { title: "Application tracker — JobePilotAI" },
-      { name: "description", content: "Track every application from saved to offer, with notes and follow-up dates." },
+      {
+        name: "description",
+        content: "Track every application from saved to offer, with notes and follow-up dates.",
+      },
       { property: "og:title", content: "Application tracker — JobePilotAI" },
-      { property: "og:description", content: "Every application, status and follow-up in one place." },
+      {
+        property: "og:description",
+        content: "Every application, status and follow-up in one place.",
+      },
     ],
   }),
   component: ApplicationsPage,
@@ -41,7 +58,12 @@ function ApplicationsPage() {
   const applicationsQuery = useQuery({ queryKey: ["applications"], queryFn: () => load() });
 
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ company_name: "", job_title: "", application_url: "", notes: "" });
+  const [form, setForm] = useState({
+    company_name: "",
+    job_title: "",
+    application_url: "",
+    notes: "",
+  });
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -63,12 +85,18 @@ function ApplicationsPage() {
       setShowForm(false);
       toast.success("Application added.");
     },
-    onError: (error: Error) => toast.error(error.message || "We couldn't add that application. Please try again."),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't add that application. Please try again."),
   });
 
   const updateMutation = useMutation({
-    mutationFn: (values: { id: string; status?: string; notes?: string; next_action?: string; follow_up_date?: string | null }) =>
-      update({ data: values as never }),
+    mutationFn: (values: {
+      id: string;
+      status?: string;
+      notes?: string;
+      next_action?: string;
+      follow_up_date?: string | null;
+    }) => update({ data: values as never }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["applications"] }),
     onError: () => toast.error("We couldn't update that application. Please try again."),
   });
@@ -89,7 +117,11 @@ function ApplicationsPage() {
       <PageHeading
         title="Application tracker"
         description="Every role you're pursuing, with status, notes and next steps."
-        actions={<Button onClick={() => setShowForm((value) => !value)}>{showForm ? "Cancel" : "Add application"}</Button>}
+        actions={
+          <Button onClick={() => setShowForm((value) => !value)}>
+            {showForm ? "Cancel" : "Add application"}
+          </Button>
+        }
       />
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -118,19 +150,42 @@ function ApplicationsPage() {
         >
           <div className="space-y-1.5">
             <Label htmlFor="company">Company</Label>
-            <Input id="company" value={form.company_name} maxLength={160} onChange={(event) => setForm({ ...form, company_name: event.target.value })} required />
+            <Input
+              id="company"
+              value={form.company_name}
+              maxLength={160}
+              onChange={(event) => setForm({ ...form, company_name: event.target.value })}
+              required
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="title">Job title</Label>
-            <Input id="title" value={form.job_title} maxLength={200} onChange={(event) => setForm({ ...form, job_title: event.target.value })} required />
+            <Input
+              id="title"
+              value={form.job_title}
+              maxLength={200}
+              onChange={(event) => setForm({ ...form, job_title: event.target.value })}
+              required
+            />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="url">Application link (optional)</Label>
-            <Input id="url" type="url" value={form.application_url} maxLength={2048} onChange={(event) => setForm({ ...form, application_url: event.target.value })} />
+            <Input
+              id="url"
+              type="url"
+              value={form.application_url}
+              maxLength={2048}
+              onChange={(event) => setForm({ ...form, application_url: event.target.value })}
+            />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" value={form.notes} maxLength={4000} onChange={(event) => setForm({ ...form, notes: event.target.value })} />
+            <Textarea
+              id="notes"
+              value={form.notes}
+              maxLength={4000}
+              onChange={(event) => setForm({ ...form, notes: event.target.value })}
+            />
           </div>
           <Button type="submit" disabled={createMutation.isPending} className="sm:col-span-2">
             Add application
@@ -158,11 +213,18 @@ function ApplicationsPage() {
               <li key={item.id} className="surface-panel p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="font-display text-base font-semibold text-foreground">{item.job_title}</h2>
+                    <h2 className="font-display text-base font-semibold text-foreground">
+                      {item.job_title}
+                    </h2>
                     <p className="text-sm text-muted-foreground">{item.company_name}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <Select value={item.status} onValueChange={(value) => updateMutation.mutate({ id: item.id, status: value })}>
+                    <Select
+                      value={item.status}
+                      onValueChange={(value) =>
+                        updateMutation.mutate({ id: item.id, status: value })
+                      }
+                    >
                       <SelectTrigger className="w-40" aria-label={`Status for ${item.job_title}`}>
                         <SelectValue />
                       </SelectTrigger>
@@ -188,7 +250,11 @@ function ApplicationsPage() {
                         </Link>
                       </Button>
                     ) : null}
-                    <Button size="sm" variant="ghost" onClick={() => deleteMutation.mutate(item.id)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => deleteMutation.mutate(item.id)}
+                    >
                       Delete
                     </Button>
                   </div>
@@ -201,7 +267,9 @@ function ApplicationsPage() {
                       id={`next-${item.id}`}
                       defaultValue={item.next_action ?? ""}
                       maxLength={300}
-                      onBlur={(event) => updateMutation.mutate({ id: item.id, next_action: event.target.value })}
+                      onBlur={(event) =>
+                        updateMutation.mutate({ id: item.id, next_action: event.target.value })
+                      }
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -211,7 +279,10 @@ function ApplicationsPage() {
                       type="date"
                       defaultValue={item.follow_up_date ?? ""}
                       onBlur={(event) =>
-                        updateMutation.mutate({ id: item.id, follow_up_date: event.target.value || null })
+                        updateMutation.mutate({
+                          id: item.id,
+                          follow_up_date: event.target.value || null,
+                        })
                       }
                     />
                   </div>
@@ -221,7 +292,9 @@ function ApplicationsPage() {
                       id={`notes-${item.id}`}
                       defaultValue={item.notes ?? ""}
                       maxLength={4000}
-                      onBlur={(event) => updateMutation.mutate({ id: item.id, notes: event.target.value })}
+                      onBlur={(event) =>
+                        updateMutation.mutate({ id: item.id, notes: event.target.value })
+                      }
                     />
                   </div>
                 </div>

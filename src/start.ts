@@ -28,12 +28,16 @@ const csrfMiddleware = createCsrfMiddleware({
 /** Baseline security headers on every response. */
 const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
   const result = await next();
-  const response = (result as unknown as { response?: Response }).response ?? (result as unknown as Response);
+  const response =
+    (result as unknown as { response?: Response }).response ?? (result as unknown as Response);
   if (response instanceof Response) {
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
     response.headers.set("X-Frame-Options", "SAMEORIGIN");
-    response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    response.headers.set(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(), payment=()",
+    );
     response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
   return result;
