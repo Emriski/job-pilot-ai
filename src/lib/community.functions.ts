@@ -112,7 +112,7 @@ async function decoratePosts(
     body: cleanText(row.body, 6000),
     linkUrl: safeExternalUrl(row.link_url),
     sharedJobId: row.shared_job_id,
-    sharedJob: (row.shared_job as Record<string, unknown> | null) ?? null,
+    sharedJob: toSharedJob(row.shared_job),
     unverifiedOpportunity: row.unverified_opportunity,
     commentCount: row.comment_count,
     reactionCount: row.reaction_count,
@@ -224,14 +224,14 @@ export const createPost = createServerFn({ method: "POST" })
       throw new Error("Choose a nickname on your profile before posting.");
     }
 
-    let sharedJob: Record<string, unknown> | null = null;
+    let sharedJob: SharedJobSummary | null = null;
     if (data.shared_job_id) {
       const { data: job } = await supabase
         .from("jobs")
         .select("id, title, company_name, location, remote, application_url, source")
         .eq("id", data.shared_job_id)
         .maybeSingle();
-      sharedJob = (job as Record<string, unknown> | null) ?? null;
+      sharedJob = toSharedJob(job);
     }
 
     const link = safeExternalUrl(data.link_url);

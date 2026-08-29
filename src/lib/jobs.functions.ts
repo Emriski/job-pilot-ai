@@ -72,7 +72,7 @@ export const listSources = createServerFn({ method: "GET" }).handler(async () =>
   const { publicSupabase } = await import("./jobs-query.server");
   const { data } = await publicSupabase()
     .from("job_sources")
-    .select("slug, label, status, enabled, job_count, last_synced_at")
-    .order("label");
+    .select("slug, name, status, enabled, job_count, last_sync_at")
+    .order("name");
   return data ?? [];
 });
