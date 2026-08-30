@@ -25,7 +25,7 @@ import { COMMUNITY_CATEGORIES } from "@/lib/community-validation";
 import { getMyIdentity } from "@/lib/identity.functions";
 import { getMyContext } from "@/lib/profile.functions";
 
-export const Route = createFileRoute("/_authenticated/community")({
+export const Route = createFileRoute("/_authenticated/community/")({
   head: () => ({
     meta: [
       { title: "Career community — JobePilotAI" },
