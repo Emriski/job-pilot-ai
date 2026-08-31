@@ -26,6 +26,7 @@ import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCommunityPostIdRouteImport } from './routes/_authenticated/community.$postId'
 import { Route as AuthenticatedJobsIndexRouteImport } from './routes/_authenticated/jobs.index'
 import { Route as AuthenticatedJobsJobIdRouteImport } from './routes/_authenticated/jobs.$jobId'
+import { Route as AuthenticatedPeopleNicknameRouteImport } from './routes/_authenticated/people.$nickname'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -115,6 +116,12 @@ const AuthenticatedJobsJobIdRoute = AuthenticatedJobsJobIdRouteImport.update({
   path: '/jobs/$jobId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPeopleNicknameRoute =
+  AuthenticatedPeopleNicknameRouteImport.update({
+    id: '/people/$nickname',
+    path: '/people/$nickname',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/people/$nickname': typeof AuthenticatedPeopleNicknameRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
   '/jobs/': typeof AuthenticatedJobsIndexRoute
 }
@@ -149,6 +157,7 @@ export interface FileRoutesByTo {
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/people/$nickname': typeof AuthenticatedPeopleNicknameRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/jobs': typeof AuthenticatedJobsIndexRoute
 }
@@ -169,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/_authenticated/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
+  '/_authenticated/people/$nickname': typeof AuthenticatedPeopleNicknameRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/jobs/': typeof AuthenticatedJobsIndexRoute
 }
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/community/$postId'
     | '/jobs/$jobId'
+    | '/people/$nickname'
     | '/community/'
     | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/sources'
     | '/community/$postId'
     | '/jobs/$jobId'
+    | '/people/$nickname'
     | '/community'
     | '/jobs'
   id:
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/sources'
     | '/_authenticated/community/$postId'
     | '/_authenticated/jobs/$jobId'
+    | '/_authenticated/people/$nickname'
     | '/_authenticated/community/'
     | '/_authenticated/jobs/'
   fileRoutesById: FileRoutesById
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobsJobIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/people/$nickname': {
+      id: '/_authenticated/people/$nickname'
+      path: '/people/$nickname'
+      fullPath: '/people/$nickname'
+      preLoaderRoute: typeof AuthenticatedPeopleNicknameRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -373,6 +393,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSourcesRoute: typeof AuthenticatedAdminSourcesRoute
   AuthenticatedCommunityPostIdRoute: typeof AuthenticatedCommunityPostIdRoute
   AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
+  AuthenticatedPeopleNicknameRoute: typeof AuthenticatedPeopleNicknameRoute
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedJobsIndexRoute: typeof AuthenticatedJobsIndexRoute
 }
@@ -387,6 +408,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSourcesRoute: AuthenticatedAdminSourcesRoute,
   AuthenticatedCommunityPostIdRoute: AuthenticatedCommunityPostIdRoute,
   AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
+  AuthenticatedPeopleNicknameRoute: AuthenticatedPeopleNicknameRoute,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedJobsIndexRoute: AuthenticatedJobsIndexRoute,
 }

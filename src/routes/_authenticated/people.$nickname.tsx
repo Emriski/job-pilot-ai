@@ -53,10 +53,10 @@ function PersonPage() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["public-profile", nickname] });
 
   const followMutation = useMutation({
-    mutationFn: () =>
-      profile?.isFollowing
-        ? unfollow({ data: { userId: profile.id } })
-        : follow({ data: { userId: profile!.id } }),
+    mutationFn: async () => {
+      if (profile?.isFollowing) await unfollow({ data: { userId: profile.id } });
+      else await follow({ data: { userId: profile!.id } });
+    },
     onSuccess: async () => {
       await invalidate();
     },
