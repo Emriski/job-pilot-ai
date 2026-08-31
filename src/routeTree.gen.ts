@@ -23,6 +23,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedAdminSourcesRouteImport } from './routes/_authenticated/admin.sources'
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
+import { Route as AuthenticatedCommunityPostIdRouteImport } from './routes/_authenticated/community.$postId'
 import { Route as AuthenticatedJobsIndexRouteImport } from './routes/_authenticated/jobs.index'
 import { Route as AuthenticatedJobsJobIdRouteImport } from './routes/_authenticated/jobs.$jobId'
 
@@ -98,6 +99,12 @@ const AuthenticatedCommunityIndexRoute =
     path: '/community/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCommunityPostIdRoute =
+  AuthenticatedCommunityPostIdRouteImport.update({
+    id: '/community/$postId',
+    path: '/community/$postId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedJobsIndexRoute = AuthenticatedJobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
@@ -122,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof AuthenticatedSavedRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
+  '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/community/': typeof AuthenticatedCommunityIndexRoute
   '/jobs/': typeof AuthenticatedJobsIndexRoute
@@ -139,6 +147,7 @@ export interface FileRoutesByTo {
   '/saved': typeof AuthenticatedSavedRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
+  '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/community': typeof AuthenticatedCommunityIndexRoute
   '/jobs': typeof AuthenticatedJobsIndexRoute
@@ -158,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/admin/sources': typeof AuthenticatedAdminSourcesRoute
+  '/_authenticated/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/_authenticated/community/': typeof AuthenticatedCommunityIndexRoute
   '/_authenticated/jobs/': typeof AuthenticatedJobsIndexRoute
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/settings'
     | '/admin/sources'
+    | '/community/$postId'
     | '/jobs/$jobId'
     | '/community/'
     | '/jobs/'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/settings'
     | '/admin/sources'
+    | '/community/$postId'
     | '/jobs/$jobId'
     | '/community'
     | '/jobs'
@@ -212,6 +224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/saved'
     | '/_authenticated/settings'
     | '/_authenticated/admin/sources'
+    | '/_authenticated/community/$postId'
     | '/_authenticated/jobs/$jobId'
     | '/_authenticated/community/'
     | '/_authenticated/jobs/'
@@ -326,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommunityIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/community/$postId': {
+      id: '/_authenticated/community/$postId'
+      path: '/community/$postId'
+      fullPath: '/community/$postId'
+      preLoaderRoute: typeof AuthenticatedCommunityPostIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/jobs/': {
       id: '/_authenticated/jobs/'
       path: '/jobs'
@@ -351,6 +371,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminSourcesRoute: typeof AuthenticatedAdminSourcesRoute
+  AuthenticatedCommunityPostIdRoute: typeof AuthenticatedCommunityPostIdRoute
   AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
   AuthenticatedCommunityIndexRoute: typeof AuthenticatedCommunityIndexRoute
   AuthenticatedJobsIndexRoute: typeof AuthenticatedJobsIndexRoute
@@ -364,6 +385,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminSourcesRoute: AuthenticatedAdminSourcesRoute,
+  AuthenticatedCommunityPostIdRoute: AuthenticatedCommunityPostIdRoute,
   AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
   AuthenticatedCommunityIndexRoute: AuthenticatedCommunityIndexRoute,
   AuthenticatedJobsIndexRoute: AuthenticatedJobsIndexRoute,
