@@ -36,7 +36,13 @@ export function AppShell({ children, isAdmin }: { children: ReactNode; isAdmin?:
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
-  const links = isAdmin ? [...NAV, { to: "/admin/sources", label: "Sources" } as const] : NAV;
+  const links = isAdmin
+    ? [
+        ...NAV,
+        { to: "/admin/sources", label: "Sources" } as const,
+        { to: "/admin/moderation", label: "Moderation" } as const,
+      ]
+    : NAV;
 
   async function signOut() {
     await queryClient.cancelQueries();
