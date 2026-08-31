@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/messages")({
   validateSearch: (search: Record<string, unknown>) => ({
-    c: typeof search.c === "string" ? search.c : undefined,
+    c: typeof search["c"] === "string" ? (search["c"] as string) : undefined,
   }),
   head: () => ({
     meta: [
