@@ -24,6 +24,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin.moderation'
 import { Route as AuthenticatedAdminSourcesRouteImport } from './routes/_authenticated/admin.sources'
 import { Route as AuthenticatedCommunityIndexRouteImport } from './routes/_authenticated/community.index'
 import { Route as AuthenticatedCommunityPostIdRouteImport } from './routes/_authenticated/community.$postId'
@@ -107,6 +108,12 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/admin/moderation',
+    path: '/admin/moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminSourcesRoute =
   AuthenticatedAdminSourcesRouteImport.update({
     id: '/admin/sources',
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/resume': typeof AuthenticatedResumeRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/resume': typeof AuthenticatedResumeRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/admin/sources': typeof AuthenticatedAdminSourcesRoute
   '/_authenticated/community/$postId': typeof AuthenticatedCommunityPostIdRoute
   '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/resume'
     | '/saved'
     | '/settings'
+    | '/admin/moderation'
     | '/admin/sources'
     | '/community/$postId'
     | '/jobs/$jobId'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/resume'
     | '/saved'
     | '/settings'
+    | '/admin/moderation'
     | '/admin/sources'
     | '/community/$postId'
     | '/jobs/$jobId'
@@ -272,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/resume'
     | '/_authenticated/saved'
     | '/_authenticated/settings'
+    | '/_authenticated/admin/moderation'
     | '/_authenticated/admin/sources'
     | '/_authenticated/community/$postId'
     | '/_authenticated/jobs/$jobId'
@@ -396,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/moderation': {
+      id: '/_authenticated/admin/moderation'
+      path: '/admin/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/sources': {
       id: '/_authenticated/admin/sources'
       path: '/admin/sources'
@@ -451,6 +471,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedAdminSourcesRoute: typeof AuthenticatedAdminSourcesRoute
   AuthenticatedCommunityPostIdRoute: typeof AuthenticatedCommunityPostIdRoute
   AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
@@ -469,6 +490,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedAdminSourcesRoute: AuthenticatedAdminSourcesRoute,
   AuthenticatedCommunityPostIdRoute: AuthenticatedCommunityPostIdRoute,
   AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
