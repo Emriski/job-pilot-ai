@@ -59,13 +59,13 @@ export function AppShell({ children, isAdmin }: { children: ReactNode; isAdmin?:
             <BrandMark />
           </Link>
 
-          <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
+          <nav aria-label="Main" className="hidden items-center gap-0.5 xl:flex">
             {links.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                  "rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                   pathname.startsWith(item.to) && "bg-accent text-foreground",
                 )}
               >
@@ -75,13 +75,13 @@ export function AppShell({ children, isAdmin }: { children: ReactNode; isAdmin?:
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="hidden lg:inline-flex" onClick={signOut}>
+            <Button variant="outline" size="sm" className="hidden xl:inline-flex" onClick={signOut}>
               Sign out
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="xl:hidden"
               aria-expanded={open}
               aria-label={open ? "Close menu" : "Open menu"}
               onClick={() => setOpen((value) => !value)}
@@ -96,7 +96,7 @@ export function AppShell({ children, isAdmin }: { children: ReactNode; isAdmin?:
         </div>
 
         {open ? (
-          <nav aria-label="Mobile" className="border-t border-border lg:hidden">
+          <nav aria-label="Mobile" className="border-t border-border xl:hidden">
             <div className="container-page flex flex-col py-2">
               {links.map((item) => (
                 <Link
