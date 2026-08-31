@@ -170,7 +170,7 @@ function PostPage() {
               <div className="rounded-md border border-border p-3 text-sm">
                 <p className="font-medium text-foreground">{data.post.sharedJob.title}</p>
                 <p className="text-muted-foreground">
-                  {data.post.sharedJob.companyName}
+                  {data.post.sharedJob.company_name}
                   {data.post.sharedJob.location ? ` · ${data.post.sharedJob.location}` : ""}
                 </p>
               </div>
