@@ -18,15 +18,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { APPLICATION_STATUSES, titleCase } from "@/lib/formatters";
 import {
   createApplication,
   deleteApplication,
+  draftFollowUp,
   listApplications,
+  markFollowedUp,
   updateApplication,
 } from "@/lib/applications.functions";
 import { getMyContext } from "@/lib/profile.functions";
 import { safeExternalUrl } from "@/lib/security";
+
 
 export const Route = createFileRoute("/_authenticated/applications")({
   head: () => ({
