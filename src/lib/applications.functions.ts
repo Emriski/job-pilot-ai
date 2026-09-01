@@ -75,3 +75,27 @@ export const deleteApplication = createServerFn({ method: "POST" })
       .eq("user_id", context.userId);
     return { ok: true };
   });
+
+export const draftFollowUp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => idSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { buildFollowUpEmail } = await import("./followup.server");
+    return buildFollowUpEmail(context.supabase, context.userId, data.id);
+  });
+
+export const markFollowedUp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => idSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("applications")
+      .update({ last_followed_up_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
+    if (error) {
+      console.error("[applications] follow-up mark failed", error.message);
+      throw new Error("We couldn't record that follow-up. Please try again.");
+    }
+    return { ok: true };
+  });
