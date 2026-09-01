@@ -116,6 +116,28 @@ function ApplicationsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["applications"] }),
   });
 
+  const followUpMutation = useMutation({
+    mutationFn: async (item: { id: string; company_name: string; job_title: string }) => {
+      const draft = await drafter({ data: { id: item.id } });
+      return { ...draft, id: item.id, company: item.company_name, role: item.job_title };
+    },
+    onSuccess: (draft) => setFollowUp(draft),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't draft that follow-up. Please try again."),
+  });
+
+  const sentMutation = useMutation({
+    mutationFn: (id: string) => markSent({ data: { id } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      toast.success("Follow-up recorded.");
+      setFollowUp(null);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+
+
   const applications = applicationsQuery.data ?? [];
   const counts = APPLICATION_STATUSES.map((status) => ({
     status,
