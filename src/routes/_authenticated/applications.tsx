@@ -294,6 +294,16 @@ function ApplicationsPage() {
                     ) : null}
                     <Button
                       size="sm"
+                      variant="secondary"
+                      disabled={followUpMutation.isPending}
+                      onClick={() => followUpMutation.mutate(item)}
+                    >
+                      {followUpMutation.isPending && followUpMutation.variables?.id === item.id
+                        ? "Drafting…"
+                        : "Follow-up email"}
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="ghost"
                       onClick={() => deleteMutation.mutate(item.id)}
                     >
@@ -301,6 +311,13 @@ function ApplicationsPage() {
                     </Button>
                   </div>
                 </div>
+
+                {item.last_followed_up_at ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Last follow-up sent {new Date(item.last_followed_up_at).toLocaleDateString()}
+                  </p>
+                ) : null}
+
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
