@@ -225,15 +225,26 @@ function AdminSourcesPage() {
                 its access rules.
               </p>
             ) : (
-              <Button
-                className="mt-4"
-                size="sm"
-                variant="outline"
-                disabled={syncMutation.isPending || !source.enabled}
-                onClick={() => syncMutation.mutate(source.slug)}
-              >
-                Sync this source
-              </Button>
+              <>
+                {BOARD_SOURCES[source.slug] ? (
+                  <BoardsEditor
+                    slug={source.slug}
+                    config={source.config}
+                    saving={boardsMutation.isPending}
+                    onSave={(boards) => boardsMutation.mutate({ slug: source.slug, boards })}
+                  />
+                ) : null}
+                <Button
+                  className="mt-4"
+                  size="sm"
+                  variant="outline"
+                  disabled={syncMutation.isPending || !source.enabled}
+                  onClick={() => syncMutation.mutate(source.slug)}
+                >
+                  Sync this source
+                </Button>
+              </>
+
             )}
           </article>
         ))}
