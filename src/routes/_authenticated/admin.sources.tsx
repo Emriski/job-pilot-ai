@@ -1,15 +1,79 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell, PageHeading } from "@/components/AppShell";
 import { ErrorState, LoadingState } from "@/components/States";
+import { TagInput } from "@/components/TagInput";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { getSourceDashboard, runSourceSync, updateSource } from "@/lib/admin.functions";
 import { getMyContext } from "@/lib/profile.functions";
+
+/** Sources whose listings come from per-company boards you configure here. */
+const BOARD_SOURCES: Record<string, { defaults: string[]; hint: string }> = {
+  greenhouse: {
+    defaults: ["gitlab", "duolingo", "airtable", "figma", "webflow"],
+    hint: "Greenhouse board tokens, e.g. the “gitlab” in boards.greenhouse.io/gitlab",
+  },
+  ashby: {
+    defaults: ["ramp", "linear", "vanta", "posthog"],
+    hint: "Ashby job board names, e.g. the “ramp” in jobs.ashbyhq.com/ramp",
+  },
+  lever: {
+    defaults: ["netflix", "spotify", "plaid"],
+    hint: "Lever company slugs, e.g. the “netflix” in jobs.lever.co/netflix",
+  },
+};
+
+function BoardsEditor({
+  slug,
+  config,
+  onSave,
+  saving,
+}: {
+  slug: string;
+  config: unknown;
+  onSave: (boards: string[]) => void;
+  saving: boolean;
+}) {
+  const meta = BOARD_SOURCES[slug]!;
+  const configured = Array.isArray((config as { boards?: unknown })?.boards)
+    ? ((config as { boards: unknown[] }).boards.filter(
+        (item) => typeof item === "string",
+      ) as string[])
+    : [];
+  const [boards, setBoards] = useState<string[]>(configured.length ? configured : meta.defaults);
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <TagInput
+        label="Company boards"
+        hint={meta.hint}
+        values={boards}
+        onChange={setBoards}
+        max={20}
+      />
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" disabled={saving || boards.length === 0} onClick={() => onSave(boards)}>
+          Save boards
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setBoards(meta.defaults)}>
+          Reset to defaults
+        </Button>
+      </div>
+      {configured.length === 0 ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          No custom boards saved yet — the built-in defaults are being synced.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/_authenticated/admin/sources")({
   head: () => ({
@@ -46,6 +110,17 @@ function AdminSourcesPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-sources"] }),
     onError: () => toast.error("We couldn't update that source. Please try again."),
   });
+
+  const boardsMutation = useMutation({
+    mutationFn: (values: { slug: string; boards: string[] }) => patch({ data: values }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-sources"] });
+      toast.success("Company boards saved. Run a sync to pull their live listings.");
+    },
+    onError: () => toast.error("We couldn't save those boards. Please try again."),
+  });
+
+
 
   const syncMutation = useMutation({
     mutationFn: (slug: string | undefined) => sync({ data: slug ? { slug } : {} }),
@@ -150,15 +225,26 @@ function AdminSourcesPage() {
                 its access rules.
               </p>
             ) : (
-              <Button
-                className="mt-4"
-                size="sm"
-                variant="outline"
-                disabled={syncMutation.isPending || !source.enabled}
-                onClick={() => syncMutation.mutate(source.slug)}
-              >
-                Sync this source
-              </Button>
+              <>
+                {BOARD_SOURCES[source.slug] ? (
+                  <BoardsEditor
+                    slug={source.slug}
+                    config={source.config}
+                    saving={boardsMutation.isPending}
+                    onSave={(boards) => boardsMutation.mutate({ slug: source.slug, boards })}
+                  />
+                ) : null}
+                <Button
+                  className="mt-4"
+                  size="sm"
+                  variant="outline"
+                  disabled={syncMutation.isPending || !source.enabled}
+                  onClick={() => syncMutation.mutate(source.slug)}
+                >
+                  Sync this source
+                </Button>
+              </>
+
             )}
           </article>
         ))}

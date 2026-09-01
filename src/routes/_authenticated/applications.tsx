@@ -18,15 +18,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { APPLICATION_STATUSES, titleCase } from "@/lib/formatters";
 import {
   createApplication,
   deleteApplication,
+  draftFollowUp,
   listApplications,
+  markFollowedUp,
   updateApplication,
 } from "@/lib/applications.functions";
 import { getMyContext } from "@/lib/profile.functions";
 import { safeExternalUrl } from "@/lib/security";
+
 
 export const Route = createFileRoute("/_authenticated/applications")({
   head: () => ({
@@ -53,11 +63,21 @@ function ApplicationsPage() {
   const create = useServerFn(createApplication);
   const update = useServerFn(updateApplication);
   const remove = useServerFn(deleteApplication);
+  const drafter = useServerFn(draftFollowUp);
+  const markSent = useServerFn(markFollowedUp);
 
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
   const applicationsQuery = useQuery({ queryKey: ["applications"], queryFn: () => load() });
 
+  const [followUp, setFollowUp] = useState<{
+    id: string;
+    company: string;
+    role: string;
+    subject: string;
+    body: string;
+  } | null>(null);
   const [showForm, setShowForm] = useState(false);
+
   const [form, setForm] = useState({
     company_name: "",
     job_title: "",
@@ -105,6 +125,28 @@ function ApplicationsPage() {
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["applications"] }),
   });
+
+  const followUpMutation = useMutation({
+    mutationFn: async (item: { id: string; company_name: string; job_title: string }) => {
+      const draft = await drafter({ data: { id: item.id } });
+      return { ...draft, id: item.id, company: item.company_name, role: item.job_title };
+    },
+    onSuccess: (draft) => setFollowUp(draft),
+    onError: (error: Error) =>
+      toast.error(error.message || "We couldn't draft that follow-up. Please try again."),
+  });
+
+  const sentMutation = useMutation({
+    mutationFn: (id: string) => markSent({ data: { id } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      toast.success("Follow-up recorded.");
+      setFollowUp(null);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+
 
   const applications = applicationsQuery.data ?? [];
   const counts = APPLICATION_STATUSES.map((status) => ({
@@ -252,6 +294,16 @@ function ApplicationsPage() {
                     ) : null}
                     <Button
                       size="sm"
+                      variant="secondary"
+                      disabled={followUpMutation.isPending}
+                      onClick={() => followUpMutation.mutate(item)}
+                    >
+                      {followUpMutation.isPending && followUpMutation.variables?.id === item.id
+                        ? "Drafting…"
+                        : "Follow-up email"}
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="ghost"
                       onClick={() => deleteMutation.mutate(item.id)}
                     >
@@ -259,6 +311,13 @@ function ApplicationsPage() {
                     </Button>
                   </div>
                 </div>
+
+                {item.last_followed_up_at ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Last follow-up sent {new Date(item.last_followed_up_at).toLocaleDateString()}
+                  </p>
+                ) : null}
+
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
@@ -303,6 +362,72 @@ function ApplicationsPage() {
           })}
         </ul>
       )}
+
+      <Dialog open={Boolean(followUp)} onOpenChange={(open) => !open && setFollowUp(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Follow-up email</DialogTitle>
+            <DialogDescription>
+              {followUp ? `${followUp.role} at ${followUp.company}` : ""} — review and edit before
+              sending from your own mailbox.
+            </DialogDescription>
+          </DialogHeader>
+          {followUp ? (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="fu-subject">Subject</Label>
+                <Input
+                  id="fu-subject"
+                  value={followUp.subject}
+                  maxLength={160}
+                  onChange={(event) => setFollowUp({ ...followUp, subject: event.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="fu-body">Message</Label>
+                <Textarea
+                  id="fu-body"
+                  className="min-h-56"
+                  value={followUp.body}
+                  maxLength={4000}
+                  onChange={(event) => setFollowUp({ ...followUp, body: event.target.value })}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `Subject: ${followUp.subject}\n\n${followUp.body}`,
+                      );
+                      toast.success("Copied to your clipboard.");
+                    } catch {
+                      toast.error("Copying isn't available in this browser.");
+                    }
+                  }}
+                >
+                  Copy email
+                </Button>
+                <Button variant="outline" asChild>
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(followUp.subject)}&body=${encodeURIComponent(followUp.body)}`}
+                  >
+                    Open in mail app
+                  </a>
+                </Button>
+                <Button
+                  variant="secondary"
+                  disabled={sentMutation.isPending}
+                  onClick={() => sentMutation.mutate(followUp.id)}
+                >
+                  Mark as sent
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </AppShell>
+
   );
 }
