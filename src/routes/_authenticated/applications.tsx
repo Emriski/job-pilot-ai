@@ -63,11 +63,21 @@ function ApplicationsPage() {
   const create = useServerFn(createApplication);
   const update = useServerFn(updateApplication);
   const remove = useServerFn(deleteApplication);
+  const drafter = useServerFn(draftFollowUp);
+  const markSent = useServerFn(markFollowedUp);
 
   const contextQuery = useQuery({ queryKey: ["me"], queryFn: () => loadContext() });
   const applicationsQuery = useQuery({ queryKey: ["applications"], queryFn: () => load() });
 
+  const [followUp, setFollowUp] = useState<{
+    id: string;
+    company: string;
+    role: string;
+    subject: string;
+    body: string;
+  } | null>(null);
   const [showForm, setShowForm] = useState(false);
+
   const [form, setForm] = useState({
     company_name: "",
     job_title: "",
