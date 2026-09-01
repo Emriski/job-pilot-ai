@@ -111,6 +111,17 @@ function AdminSourcesPage() {
     onError: () => toast.error("We couldn't update that source. Please try again."),
   });
 
+  const boardsMutation = useMutation({
+    mutationFn: (values: { slug: string; boards: string[] }) => patch({ data: values }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-sources"] });
+      toast.success("Company boards saved. Run a sync to pull their live listings.");
+    },
+    onError: () => toast.error("We couldn't save those boards. Please try again."),
+  });
+
+
+
   const syncMutation = useMutation({
     mutationFn: (slug: string | undefined) => sync({ data: slug ? { slug } : {} }),
     onSuccess: async (result) => {
