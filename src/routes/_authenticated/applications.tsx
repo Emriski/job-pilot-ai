@@ -362,6 +362,72 @@ function ApplicationsPage() {
           })}
         </ul>
       )}
+
+      <Dialog open={Boolean(followUp)} onOpenChange={(open) => !open && setFollowUp(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Follow-up email</DialogTitle>
+            <DialogDescription>
+              {followUp ? `${followUp.role} at ${followUp.company}` : ""} — review and edit before
+              sending from your own mailbox.
+            </DialogDescription>
+          </DialogHeader>
+          {followUp ? (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="fu-subject">Subject</Label>
+                <Input
+                  id="fu-subject"
+                  value={followUp.subject}
+                  maxLength={160}
+                  onChange={(event) => setFollowUp({ ...followUp, subject: event.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="fu-body">Message</Label>
+                <Textarea
+                  id="fu-body"
+                  className="min-h-56"
+                  value={followUp.body}
+                  maxLength={4000}
+                  onChange={(event) => setFollowUp({ ...followUp, body: event.target.value })}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `Subject: ${followUp.subject}\n\n${followUp.body}`,
+                      );
+                      toast.success("Copied to your clipboard.");
+                    } catch {
+                      toast.error("Copying isn't available in this browser.");
+                    }
+                  }}
+                >
+                  Copy email
+                </Button>
+                <Button variant="outline" asChild>
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(followUp.subject)}&body=${encodeURIComponent(followUp.body)}`}
+                  >
+                    Open in mail app
+                  </a>
+                </Button>
+                <Button
+                  variant="secondary"
+                  disabled={sentMutation.isPending}
+                  onClick={() => sentMutation.mutate(followUp.id)}
+                >
+                  Mark as sent
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </AppShell>
+
   );
 }
